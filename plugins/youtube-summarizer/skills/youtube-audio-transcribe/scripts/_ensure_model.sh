@@ -134,6 +134,7 @@ else
         _DOWNLOAD_URL=$(get_model_url "$MODEL_NAME")
         _MODEL_SIZE=$(get_model_size_bytes "$MODEL_NAME")
         _MODEL_SIZE_HUMAN=$(get_model_size_human "$MODEL_NAME")
+        _OUTPUT_PATH="$_MODEL_PATH_CHECK"
 
         MODEL_ERROR_JSON=$(cat <<EOF
 {
@@ -142,8 +143,9 @@ else
     "model": "$MODEL_NAME",
     "model_size": "$_MODEL_SIZE_HUMAN",
     "model_size_bytes": $_MODEL_SIZE,
-    "download_command": "$SCRIPT_DIR/download-model.sh $MODEL_NAME",
-    "download_url": "$_DOWNLOAD_URL"
+    "download_command": "curl -L --progress-bar -o '$_OUTPUT_PATH' '$_DOWNLOAD_URL'",
+    "download_url": "$_DOWNLOAD_URL",
+    "output_path": "$_OUTPUT_PATH"
 }
 EOF
 )

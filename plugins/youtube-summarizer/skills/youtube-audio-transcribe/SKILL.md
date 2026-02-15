@@ -123,8 +123,18 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 
 When you receive `MODEL_NOT_FOUND` error:
 1. Tell user the model needs to be downloaded first
-2. Provide the download command for them to run in terminal
+2. Display the `download_command` in a code block (\`\`\`bash) so user can copy without line breaks
 3. Explain that running in terminal shows progress bar
+
+Example response format:
+
+> 模型尚未下載。請在 Terminal 執行以下指令：
+>
+> \`\`\`bash
+> curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...'
+> \`\`\`
+>
+> 下載完成後再執行轉錄。
 
 ## Output Fields
 
