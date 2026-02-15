@@ -119,3 +119,13 @@ Supported browsers:
 - Output format depends on source (typically m4a, webm, or opus)
 - Cookie fallback only activates when initial download fails
 - Using cookies may risk YouTube account suspension - use secondary account if needed
+
+## Next Step
+
+After downloading the audio, invoke `/youtube-audio-transcribe` with the `file_path` from the output:
+
+```
+/youtube-audio-transcribe <file_path> [model] [language]
+```
+
+**Tip**: If you know the video's language from `/youtube-get-info`, pass it as the language parameter for better model auto-selection (e.g., `zh` → belle-zh, `ja` → kotoba-ja).

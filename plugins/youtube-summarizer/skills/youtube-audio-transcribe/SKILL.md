@@ -242,3 +242,13 @@ Models are NOT auto-downloaded. To download a model:
 ./scripts/download-model.sh kotoba-ja   # 1.4GB (Japanese)
 ./scripts/download-model.sh --list      # Show all available models
 ```
+
+## Next Step
+
+After transcription completes, invoke `/transcript-summarize` with the `text_file_path` from the output to generate a structured summary:
+
+```
+/transcript-summarize <text_file_path>
+```
+
+**IMPORTANT**: Always use the Skill tool to invoke `/transcript-summarize`. Do NOT generate summaries directly without loading the skill — it contains critical rules for compression ratio, section structure, data preservation, and language handling.
