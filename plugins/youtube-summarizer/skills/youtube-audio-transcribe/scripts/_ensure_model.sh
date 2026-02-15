@@ -1,13 +1,17 @@
 #!/bin/bash
 # _ensure_model.sh - Ensure whisper model is available
 #
-# Downloads model from Hugging Face if not present
+# Checks if model exists locally. Does NOT auto-download.
+# For downloading, use: ./scripts/download-model.sh <model_name>
 #
 # Usage:
 #   source "$(dirname "$0")/_ensure_model.sh" [model_name]
 #   echo "Model path: $MODEL_PATH"
-
-set -e
+#
+# Exit codes:
+#   0 - Model found (MODEL_PATH is set)
+#   1 - Unknown model (MODEL_ERROR_JSON is set)
+#   2 - Model not found (MODEL_ERROR_JSON is set)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODELS_DIR="$SCRIPT_DIR/../models"
@@ -17,6 +21,40 @@ MODEL_NAME="${1:-medium}"
 
 # Hugging Face base URL
 HF_BASE_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main"
+
+# Get model size in bytes
+get_model_size_bytes() {
+    local name="$1"
+    case "$name" in
+        tiny|tiny.en)         echo "77691713" ;;
+        base|base.en)         echo "147951465" ;;
+        small|small.en)       echo "488210841" ;;
+        medium|medium.en)     echo "1572864000" ;;
+        large-v1|large-v2|large-v3) echo "3094623232" ;;
+        large-v3-turbo)       echo "1620000000" ;;
+        belle-zh)             echo "1620000000" ;;
+        kotoba-ja)            echo "1620000000" ;;
+        kotoba-ja-q5)         echo "600000000" ;;
+        *)                    echo "0" ;;
+    esac
+}
+
+# Get model size human readable
+get_model_size_human() {
+    local name="$1"
+    case "$name" in
+        tiny|tiny.en)         echo "75MB" ;;
+        base|base.en)         echo "142MB" ;;
+        small|small.en)       echo "466MB" ;;
+        medium|medium.en)     echo "1.5GB" ;;
+        large-v1|large-v2|large-v3) echo "2.9GB" ;;
+        large-v3-turbo)       echo "1.5GB" ;;
+        belle-zh)             echo "1.5GB" ;;
+        kotoba-ja)            echo "1.5GB" ;;
+        kotoba-ja-q5)         echo "600MB" ;;
+        *)                    echo "unknown" ;;
+    esac
+}
 
 # Map model name to local filename
 get_model_filename() {
@@ -36,9 +74,7 @@ get_model_filename() {
         kotoba-ja)        echo "ggml-kotoba-ja.bin" ;;
         kotoba-ja-q5)     echo "ggml-kotoba-ja-q5.bin" ;;
         *)
-            echo "ERROR: Unknown model: $name" >&2
-            echo "Available: tiny, base, small, medium, large-v3, belle-zh, kotoba-ja, kotoba-ja-q5" >&2
-            exit 1
+            echo ""
             ;;
     esac
 }
@@ -67,35 +103,60 @@ get_model_url() {
     esac
 }
 
-download_model() {
-    local model_name="$1"
-    local filename
-    filename=$(get_model_filename "$model_name")
-    local model_path="$MODELS_DIR/$filename"
-    local download_url
-    download_url=$(get_model_url "$model_name")
+# Initialize result variables
+MODEL_PATH=""
+MODEL_ERROR_JSON=""
+_MODEL_EXIT_CODE=0
 
-    # Check if already downloaded
-    if [ -f "$model_path" ]; then
-        echo "$model_path"
-        return 0
-    fi
+# Get filename
+_MODEL_FILENAME=$(get_model_filename "$MODEL_NAME")
 
-    echo "[INFO] Downloading model: $filename..." >&2
-    mkdir -p "$MODELS_DIR"
-
-    if command -v curl &> /dev/null; then
-        curl -L --progress-bar -o "$model_path" "$download_url"
-    elif command -v wget &> /dev/null; then
-        wget --show-progress -O "$model_path" "$download_url"
-    else
-        echo "ERROR: curl or wget required to download model" >&2
-        exit 1
-    fi
-
-    echo "[INFO] Model downloaded: $model_path" >&2
-    echo "$model_path"
+# Check for unknown model
+if [ -z "$_MODEL_FILENAME" ]; then
+    MODEL_ERROR_JSON=$(cat <<EOF
+{
+    "error_code": "UNKNOWN_MODEL",
+    "message": "Unknown model: $MODEL_NAME",
+    "available_models": ["tiny", "base", "small", "medium", "large-v3", "belle-zh", "kotoba-ja", "kotoba-ja-q5"]
 }
+EOF
+)
+    _MODEL_EXIT_CODE=1
+else
+    _MODEL_PATH_CHECK="$MODELS_DIR/$_MODEL_FILENAME"
 
-# Get model path
-MODEL_PATH="$(download_model "$MODEL_NAME")"
+    # Check if model file exists
+    if [ -f "$_MODEL_PATH_CHECK" ]; then
+        MODEL_PATH="$_MODEL_PATH_CHECK"
+        _MODEL_EXIT_CODE=0
+    else
+        # Model not found - prepare error info
+        _DOWNLOAD_URL=$(get_model_url "$MODEL_NAME")
+        _MODEL_SIZE=$(get_model_size_bytes "$MODEL_NAME")
+        _MODEL_SIZE_HUMAN=$(get_model_size_human "$MODEL_NAME")
+
+        MODEL_ERROR_JSON=$(cat <<EOF
+{
+    "error_code": "MODEL_NOT_FOUND",
+    "message": "Model '$MODEL_NAME' not found. Please download it first.",
+    "model": "$MODEL_NAME",
+    "model_size": "$_MODEL_SIZE_HUMAN",
+    "model_size_bytes": $_MODEL_SIZE,
+    "download_command": "./scripts/download-model.sh $MODEL_NAME",
+    "download_url": "$_DOWNLOAD_URL"
+}
+EOF
+)
+        _MODEL_EXIT_CODE=2
+    fi
+fi
+
+# Export results
+export MODEL_PATH
+export MODEL_NAME
+export MODEL_ERROR_JSON
+
+# Return/exit with appropriate code
+if [ $_MODEL_EXIT_CODE -ne 0 ]; then
+    return $_MODEL_EXIT_CODE 2>/dev/null || exit $_MODEL_EXIT_CODE
+fi

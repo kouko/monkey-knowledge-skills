@@ -44,8 +44,8 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ## How it Works
 
 1. Execute: `{baseDir}/scripts/transcribe.sh "<audio_file>" "<model>" "<language>"`
-2. Convert audio to 16kHz mono WAV using ffmpeg
-3. Download model if not present
+2. Check if model exists (does NOT auto-download)
+3. Convert audio to 16kHz mono WAV using ffmpeg
 4. Run whisper-cli for transcription
 5. Save full JSON to `/tmp/youtube-audio-transcribe/<filename>.json`
 6. Save plain text to `/tmp/youtube-audio-transcribe/<filename>.txt`
@@ -100,13 +100,31 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 }
 ```
 
-**Error:**
+**Error (general):**
 ```json
 {
   "status": "error",
   "message": "Error description"
 }
 ```
+
+**Error (model not found):**
+```json
+{
+  "status": "error",
+  "error_code": "MODEL_NOT_FOUND",
+  "message": "Model 'medium' not found. Please download it first.",
+  "model": "medium",
+  "model_size": "1.5GB",
+  "download_command": "./scripts/download-model.sh medium",
+  "hint": "Run the download_command in terminal to download the model with progress bar"
+}
+```
+
+When you receive `MODEL_NOT_FOUND` error:
+1. Tell user the model needs to be downloaded first
+2. Provide the download command for them to run in terminal
+3. Explain that running in terminal shows progress bar
 
 ## Output Fields
 
@@ -178,8 +196,20 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 - **Specify language for best results** - enables auto-selection of specialized models (zh→belle-zh, ja→kotoba-ja)
 - Use Read tool to get file content from `file_path` or `text_file_path`
-- First run downloads the model (~1.5GB for medium)
+- **Models must be downloaded before first use** - run `./scripts/download-model.sh <model>` in terminal
 - Uses Metal acceleration on macOS for faster processing
 - Supports auto language detection
 - Audio is converted to 16kHz WAV for optimal results
 - Requires ffmpeg and whisper-cli (pre-built in bin/)
+
+## Model Download
+
+Models are NOT auto-downloaded. To download a model:
+
+```bash
+# In terminal (to see progress bar)
+./scripts/download-model.sh medium      # 1.5GB
+./scripts/download-model.sh belle-zh    # 1.5GB (Chinese)
+./scripts/download-model.sh kotoba-ja   # 1.5GB (Japanese)
+./scripts/download-model.sh --list      # Show all available models
+```

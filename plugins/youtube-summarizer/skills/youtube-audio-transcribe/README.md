@@ -25,10 +25,11 @@ youtube-audio-transcribe/
 └── scripts/
     ├── _ensure_ffmpeg.sh    # Ensures ffmpeg is available
     ├── _ensure_whisper.sh   # Ensures whisper-cli is available
-    ├── _ensure_model.sh     # Ensures model is downloaded
+    ├── _ensure_model.sh     # Checks model exists (no auto-download)
     ├── _ensure_jq.sh        # Ensures jq is available
     ├── _build_whisper.sh    # Build script for updates
     ├── _download_ffmpeg.sh  # Download script for updates
+    ├── download-model.sh    # Download whisper models
     └── transcribe.sh        # Main transcription script
 ```
 
@@ -163,6 +164,26 @@ The JSON file at `file_path` contains:
 }
 ```
 
+## Model Download
+
+Models must be downloaded before first use. Run in terminal to see progress bar:
+
+```bash
+# Download a model
+./scripts/download-model.sh medium      # 1.5GB, general purpose
+./scripts/download-model.sh belle-zh    # 1.5GB, Chinese-specialized
+./scripts/download-model.sh kotoba-ja   # 1.5GB, Japanese-specialized
+./scripts/download-model.sh tiny        # 75MB, fastest
+
+# List all available models
+./scripts/download-model.sh --list
+```
+
+Models are saved to `models/` directory. This step is required because:
+- Large model files (up to 2.9GB) need progress feedback
+- Running in terminal shows download progress bar
+- Avoids timeout issues in Claude Code
+
 ## Examples
 
 ```bash
@@ -267,10 +288,28 @@ Automatically detects architecture (Apple Silicon or Intel) and downloads the ap
 
 | Error | Cause | Solution |
 |-------|-------|----------|
+| `MODEL_NOT_FOUND` | Model not downloaded | Run `./scripts/download-model.sh <model>` |
 | `File not found` | Invalid path | Check file path |
 | `Transcription failed` | whisper error | Check audio format |
 | `ffmpeg not found` | Missing ffmpeg | Run _download_ffmpeg.sh |
 | `whisper-cli not found` | Missing whisper | Run _build_whisper.sh |
+
+### Model Not Found Error
+
+When a model is not downloaded, the script returns:
+
+```json
+{
+  "status": "error",
+  "error_code": "MODEL_NOT_FOUND",
+  "message": "Model 'medium' not found. Please download it first.",
+  "model": "medium",
+  "model_size": "1.5GB",
+  "download_command": "./scripts/download-model.sh medium"
+}
+```
+
+Run the `download_command` in terminal to download with progress bar.
 
 ## Performance Tips
 

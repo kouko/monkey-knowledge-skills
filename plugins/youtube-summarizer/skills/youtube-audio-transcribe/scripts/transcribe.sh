@@ -56,8 +56,33 @@ if [ ! -f "$AUDIO_FILE" ]; then
     exit 1
 fi
 
-# Ensure model is downloaded
+# Ensure model is available (does NOT auto-download)
+set +e
 source "$SCRIPT_DIR/_ensure_model.sh" "$MODEL"
+MODEL_EXIT_CODE=$?
+set -e
+
+if [ $MODEL_EXIT_CODE -eq 2 ]; then
+    # Model not found - output structured error with download info
+    echo "$MODEL_ERROR_JSON" | "$JQ" '{
+        status: "error",
+        error_code: .error_code,
+        message: .message,
+        model: .model,
+        model_size: .model_size,
+        download_command: .download_command,
+        hint: "Run the download_command in terminal to download the model with progress bar"
+    }'
+    exit 1
+elif [ $MODEL_EXIT_CODE -ne 0 ]; then
+    # Other error (unknown model, etc.)
+    if [ -n "$MODEL_ERROR_JSON" ]; then
+        echo "$MODEL_ERROR_JSON" | "$JQ" '{status: "error"} + .'
+    else
+        "$JQ" -n --arg model "$MODEL" '{status: "error", message: ("Failed to load model: " + $model)}'
+    fi
+    exit 1
+fi
 
 # Create temp directory for processing
 TEMP_DIR="/tmp/whisper-transcribe-$$"
