@@ -20,5 +20,9 @@ fi
         view_count,
         upload_date,
         language,
-        description: .description[0:1000]
+        description: .description[0:1000],
+        has_subtitles: ((.subtitles | keys | length) > 0),
+        subtitle_languages: (.subtitles | keys // []),
+        has_auto_captions: ((.automatic_captions | keys | length) > 0),
+        auto_caption_count: (.automatic_captions | keys | length // 0)
     }'

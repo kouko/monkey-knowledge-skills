@@ -39,13 +39,37 @@ Get video details and generate content summary.
 
 ## Output Format
 
-### Video Info
-- **Title**: ...
-- **Channel**: ...
-- **Duration**: ...
-- **Views**: ...
-- **Upload Date**: ...
-- **Language**: ... (ISO 639-1 code, e.g., en, ja, ko)
+```json
+{
+  "title": "Video Title",
+  "channel": "Channel Name",
+  "duration_string": "10:30",
+  "view_count": 1234567,
+  "upload_date": "20240101",
+  "language": "en",
+  "description": "Video description (first 1000 chars)",
+  "has_subtitles": true,
+  "subtitle_languages": ["en", "ja", "zh-Hant"],
+  "has_auto_captions": true,
+  "auto_caption_count": 157
+}
+```
+
+### Fields
+
+| Field | Description |
+|-------|-------------|
+| `title` | Video title |
+| `channel` | Channel name |
+| `duration_string` | Duration (e.g., "10:30") |
+| `view_count` | Number of views |
+| `upload_date` | Upload date (YYYYMMDD) |
+| `language` | Primary language (ISO 639-1 code) |
+| `description` | Video description (truncated to 1000 chars) |
+| `has_subtitles` | Whether manual subtitles exist |
+| `subtitle_languages` | Array of available subtitle language codes |
+| `has_auto_captions` | Whether auto-generated captions exist |
+| `auto_caption_count` | Number of auto-generated caption languages |
 
 ### Content Summary
 (Generated from subtitle analysis)
