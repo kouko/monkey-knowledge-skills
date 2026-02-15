@@ -9,99 +9,19 @@
 #   echo "Model path: $MODEL_PATH"
 #
 # Exit codes:
-#   0 - Model found (MODEL_PATH is set)
+#   0 - Model found and verified (MODEL_PATH is set)
 #   1 - Unknown model (MODEL_ERROR_JSON is set)
 #   2 - Model not found (MODEL_ERROR_JSON is set)
+#   3 - Model corrupted (MODEL_ERROR_JSON is set)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODELS_DIR="$SCRIPT_DIR/../models"
 
+# Source common functions
+source "$SCRIPT_DIR/_model_common.sh"
+
 # Model name (default: medium)
 MODEL_NAME="${1:-medium}"
-
-# Hugging Face base URL
-HF_BASE_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main"
-
-# Get model size in bytes
-get_model_size_bytes() {
-    local name="$1"
-    case "$name" in
-        tiny|tiny.en)         echo "77691713" ;;
-        base|base.en)         echo "147951465" ;;
-        small|small.en)       echo "488210841" ;;
-        medium|medium.en)     echo "1572864000" ;;
-        large-v1|large-v2|large-v3) echo "3094623232" ;;
-        large-v3-turbo)       echo "1620000000" ;;
-        belle-zh)             echo "1620000000" ;;
-        kotoba-ja)            echo "1620000000" ;;
-        kotoba-ja-q5)         echo "600000000" ;;
-        *)                    echo "0" ;;
-    esac
-}
-
-# Get model size human readable
-get_model_size_human() {
-    local name="$1"
-    case "$name" in
-        tiny|tiny.en)         echo "75MB" ;;
-        base|base.en)         echo "142MB" ;;
-        small|small.en)       echo "466MB" ;;
-        medium|medium.en)     echo "1.5GB" ;;
-        large-v1|large-v2|large-v3) echo "2.9GB" ;;
-        large-v3-turbo)       echo "1.5GB" ;;
-        belle-zh)             echo "1.5GB" ;;
-        kotoba-ja)            echo "1.5GB" ;;
-        kotoba-ja-q5)         echo "600MB" ;;
-        *)                    echo "unknown" ;;
-    esac
-}
-
-# Map model name to local filename
-get_model_filename() {
-    local name="$1"
-    case "$name" in
-        # Standard whisper.cpp models
-        tiny|tiny.en)     echo "ggml-${name}.bin" ;;
-        base|base.en)     echo "ggml-${name}.bin" ;;
-        small|small.en)   echo "ggml-${name}.bin" ;;
-        medium|medium.en) echo "ggml-${name}.bin" ;;
-        large|large-v1)   echo "ggml-large-v1.bin" ;;
-        large-v2)         echo "ggml-large-v2.bin" ;;
-        large-v3)         echo "ggml-large-v3.bin" ;;
-        large-v3-turbo)   echo "ggml-large-v3-turbo.bin" ;;
-        # Language-specialized models
-        belle-zh)         echo "ggml-belle-zh.bin" ;;
-        kotoba-ja)        echo "ggml-kotoba-ja.bin" ;;
-        kotoba-ja-q5)     echo "ggml-kotoba-ja-q5.bin" ;;
-        *)
-            echo ""
-            ;;
-    esac
-}
-
-# Get download URL for model
-get_model_url() {
-    local name="$1"
-    case "$name" in
-        # Chinese-specialized model (BELLE-2)
-        belle-zh)
-            echo "https://huggingface.co/BELLE-2/Belle-whisper-large-v3-turbo-zh-ggml/resolve/main/ggml-model.bin"
-            ;;
-        # Japanese-specialized model (kotoba-tech)
-        kotoba-ja)
-            echo "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml/resolve/main/ggml-kotoba-whisper-v2.0.bin"
-            ;;
-        kotoba-ja-q5)
-            echo "https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml/resolve/main/ggml-kotoba-whisper-v2.0-q5_0.bin"
-            ;;
-        # Standard whisper.cpp models
-        *)
-            local filename
-            filename=$(get_model_filename "$name")
-            echo "$HF_BASE_URL/$filename"
-            ;;
-    esac
-}
 
 # Initialize result variables
 MODEL_PATH=""
@@ -117,35 +37,62 @@ if [ -z "$_MODEL_FILENAME" ]; then
 {
     "error_code": "UNKNOWN_MODEL",
     "message": "Unknown model: $MODEL_NAME",
-    "available_models": ["tiny", "base", "small", "medium", "large-v3", "belle-zh", "kotoba-ja", "kotoba-ja-q5"]
+    "available_models": ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo", "belle-zh", "kotoba-ja", "kotoba-ja-q5"]
 }
 EOF
 )
     _MODEL_EXIT_CODE=1
 else
     _MODEL_PATH_CHECK="$MODELS_DIR/$_MODEL_FILENAME"
+    _DOWNLOAD_URL=$(get_model_url "$MODEL_NAME")
+    _MODEL_SIZE_HUMAN=$(get_model_size_human "$MODEL_NAME")
 
     # Check if model file exists
     if [ -f "$_MODEL_PATH_CHECK" ]; then
-        MODEL_PATH="$_MODEL_PATH_CHECK"
-        _MODEL_EXIT_CODE=0
-    else
-        # Model not found - prepare error info
-        _DOWNLOAD_URL=$(get_model_url "$MODEL_NAME")
-        _MODEL_SIZE=$(get_model_size_bytes "$MODEL_NAME")
-        _MODEL_SIZE_HUMAN=$(get_model_size_human "$MODEL_NAME")
-        _OUTPUT_PATH="$_MODEL_PATH_CHECK"
+        # File exists - verify SHA256
+        _EXPECTED_SHA256=$(get_model_sha256 "$MODEL_NAME")
 
+        if [ -z "$_EXPECTED_SHA256" ]; then
+            # No SHA256 defined for this model - skip verification
+            MODEL_PATH="$_MODEL_PATH_CHECK"
+            _MODEL_EXIT_CODE=0
+        else
+            # Calculate local SHA256
+            _ACTUAL_SHA256=$(shasum -a 256 "$_MODEL_PATH_CHECK" 2>/dev/null | awk '{print $1}')
+
+            if [ "$_ACTUAL_SHA256" = "$_EXPECTED_SHA256" ]; then
+                # SHA256 verified
+                MODEL_PATH="$_MODEL_PATH_CHECK"
+                _MODEL_EXIT_CODE=0
+            else
+                # SHA256 mismatch - model corrupted or incomplete
+                MODEL_ERROR_JSON=$(cat <<EOF
+{
+    "error_code": "MODEL_CORRUPTED",
+    "message": "Model '$MODEL_NAME' is corrupted or incomplete. Please re-download.",
+    "model": "$MODEL_NAME",
+    "model_size": "$_MODEL_SIZE_HUMAN",
+    "expected_sha256": "$_EXPECTED_SHA256",
+    "actual_sha256": "$_ACTUAL_SHA256",
+    "model_path": "$_MODEL_PATH_CHECK",
+    "download_command": "rm '$_MODEL_PATH_CHECK' && curl -L --progress-bar -o '$_MODEL_PATH_CHECK' '$_DOWNLOAD_URL' 2>&1"
+}
+EOF
+)
+                _MODEL_EXIT_CODE=3
+            fi
+        fi
+    else
+        # Model not found
         MODEL_ERROR_JSON=$(cat <<EOF
 {
     "error_code": "MODEL_NOT_FOUND",
     "message": "Model '$MODEL_NAME' not found. Please download it first.",
     "model": "$MODEL_NAME",
     "model_size": "$_MODEL_SIZE_HUMAN",
-    "model_size_bytes": $_MODEL_SIZE,
-    "download_command": "curl -L --progress-bar -o '$_OUTPUT_PATH' '$_DOWNLOAD_URL'",
+    "download_command": "curl -L --progress-bar -o '$_MODEL_PATH_CHECK' '$_DOWNLOAD_URL' 2>&1",
     "download_url": "$_DOWNLOAD_URL",
-    "output_path": "$_OUTPUT_PATH"
+    "output_path": "$_MODEL_PATH_CHECK"
 }
 EOF
 )

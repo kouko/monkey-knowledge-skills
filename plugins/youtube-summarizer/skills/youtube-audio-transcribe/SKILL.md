@@ -115,16 +115,43 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
   "error_code": "MODEL_NOT_FOUND",
   "message": "Model 'medium' not found. Please download it first.",
   "model": "medium",
-  "model_size": "1.5GB",
-  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...'",
+  "model_size": "1.4GB",
+  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1",
   "download_url": "https://huggingface.co/...",
   "output_path": "/path/to/models/ggml-medium.bin"
 }
 ```
 
 When you receive `MODEL_NOT_FOUND` error:
-1. Ask user if they want to download the model now
-2. If user agrees: run `download_command` in background, then retry transcription when complete
+1. Ask user if they want to download the model now using AskUserQuestion tool
+2. If user agrees: execute `download_command` (curl) using Bash tool with `timeout: 600000` (10 minutes), then retry transcription when complete
+3. Progress will be shown in real-time due to `2>&1` redirect in download_command
+4. If user declines: show the same curl command in a code block for manual execution
+
+Example flow:
+1. Execute transcribe.sh → receive MODEL_NOT_FOUND
+2. Ask: "Model 'medium' (1.5GB) not found. Download now?"
+3. If yes: run Bash tool with the `download_command` curl command
+4. When complete: retry transcribe.sh
+
+**Error (model corrupted):**
+```json
+{
+  "status": "error",
+  "error_code": "MODEL_CORRUPTED",
+  "message": "Model 'medium' is corrupted or incomplete. Please re-download.",
+  "model": "medium",
+  "model_size": "1.4GB",
+  "expected_sha256": "6c14d5adee5f86394037b4e4e8b59f1673b6cee10e3cf0b11bbdbee79c156208",
+  "actual_sha256": "def456...",
+  "model_path": "/path/to/models/ggml-medium.bin",
+  "download_command": "rm '/path/to/models/ggml-medium.bin' && curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1"
+}
+```
+
+When you receive `MODEL_CORRUPTED` error:
+1. Ask user: "Model 'medium' is corrupted or incomplete. Re-download now?"
+2. If user agrees: execute `download_command` (removes corrupted file and re-downloads) using Bash tool with `timeout: 600000`
 3. If user declines: show the command in a code block for manual execution
 
 ## Output Fields
@@ -167,19 +194,20 @@ The JSON file at `file_path` contains:
 | Model | Size | RAM | Speed | Accuracy |
 |-------|------|-----|-------|----------|
 | auto | - | - | - | Auto-select based on language (default) |
-| tiny | 75MB | ~273MB | Fastest | Low |
-| base | 142MB | ~388MB | Fast | Medium |
-| small | 466MB | ~852MB | Moderate | Good |
-| medium | 1.5GB | ~2.1GB | Slow | High |
+| tiny | 74MB | ~273MB | Fastest | Low |
+| base | 141MB | ~388MB | Fast | Medium |
+| small | 465MB | ~852MB | Moderate | Good |
+| medium | 1.4GB | ~2.1GB | Slow | High |
 | large-v3 | 2.9GB | ~3.9GB | Slowest | Best |
+| large-v3-turbo | 1.5GB | ~2.1GB | Moderate | High (optimized for speed) |
 
 ### Language-Specialized Models
 
 | Model | Language | Size | Description |
 |-------|----------|------|-------------|
-| belle-zh | Chinese | 1.62GB | BELLE-2 Chinese-specialized model |
-| kotoba-ja | Japanese | - | kotoba-tech Japanese-specialized model |
-| kotoba-ja-q5 | Japanese | smaller | Quantized version (faster, smaller) |
+| belle-zh | Chinese | 1.5GB | BELLE-2 Chinese-specialized model |
+| kotoba-ja | Japanese | 1.4GB | kotoba-tech Japanese-specialized model |
+| kotoba-ja-q5 | Japanese | 513MB | Quantized version (faster, smaller) |
 
 ### Auto-Selection (model=auto)
 
@@ -209,8 +237,8 @@ Models are NOT auto-downloaded. To download a model:
 
 ```bash
 # In terminal (to see progress bar)
-./scripts/download-model.sh medium      # 1.5GB
+./scripts/download-model.sh medium      # 1.4GB
 ./scripts/download-model.sh belle-zh    # 1.5GB (Chinese)
-./scripts/download-model.sh kotoba-ja   # 1.5GB (Japanese)
+./scripts/download-model.sh kotoba-ja   # 1.4GB (Japanese)
 ./scripts/download-model.sh --list      # Show all available models
 ```

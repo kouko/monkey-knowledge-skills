@@ -64,19 +64,20 @@ youtube-audio-transcribe/
 | Model | Size | RAM | Description |
 |-------|------|-----|-------------|
 | auto | - | - | Automatic selection based on language (default) |
-| tiny | 75MB | ~273MB | Fastest, lowest accuracy |
-| base | 142MB | ~388MB | Fast, moderate accuracy |
-| small | 466MB | ~852MB | Balanced |
-| medium | 1.5GB | ~2.1GB | High accuracy |
+| tiny | 74MB | ~273MB | Fastest, lowest accuracy |
+| base | 141MB | ~388MB | Fast, moderate accuracy |
+| small | 465MB | ~852MB | Balanced |
+| medium | 1.4GB | ~2.1GB | High accuracy |
 | large-v3 | 2.9GB | ~3.9GB | Best accuracy |
+| large-v3-turbo | 1.5GB | ~2.1GB | Large model optimized for speed |
 
 #### Language-Specialized Models
 
 | Model | Language | Size | Source |
 |-------|----------|------|--------|
-| belle-zh | Chinese | 1.62GB | [BELLE-2](https://huggingface.co/BELLE-2/Belle-whisper-large-v3-turbo-zh-ggml) |
-| kotoba-ja | Japanese | - | [kotoba-tech](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml) |
-| kotoba-ja-q5 | Japanese | smaller | Quantized version (faster) |
+| belle-zh | Chinese | 1.5GB | [BELLE-2](https://huggingface.co/BELLE-2/Belle-whisper-large-v3-turbo-zh-ggml) |
+| kotoba-ja | Japanese | 1.4GB | [kotoba-tech](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-ggml) |
+| kotoba-ja-q5 | Japanese | 513MB | Quantized version (faster) |
 
 #### Auto-Selection (model=auto)
 
@@ -170,10 +171,10 @@ Models must be downloaded before first use. Run in terminal to see progress bar:
 
 ```bash
 # Download a model
-./scripts/download-model.sh medium      # 1.5GB, general purpose
+./scripts/download-model.sh medium      # 1.4GB, general purpose
 ./scripts/download-model.sh belle-zh    # 1.5GB, Chinese-specialized
-./scripts/download-model.sh kotoba-ja   # 1.5GB, Japanese-specialized
-./scripts/download-model.sh tiny        # 75MB, fastest
+./scripts/download-model.sh kotoba-ja   # 1.4GB, Japanese-specialized
+./scripts/download-model.sh tiny        # 74MB, fastest
 
 # List all available models
 ./scripts/download-model.sh --list
@@ -289,6 +290,7 @@ Automatically detects architecture (Apple Silicon or Intel) and downloads the ap
 | Error | Cause | Solution |
 |-------|-------|----------|
 | `MODEL_NOT_FOUND` | Model not downloaded | Run `./scripts/download-model.sh <model>` |
+| `MODEL_CORRUPTED` | Model file corrupted or incomplete | Re-download with `download_command` |
 | `File not found` | Invalid path | Check file path |
 | `Transcription failed` | whisper error | Check audio format |
 | `ffmpeg not found` | Missing ffmpeg | Run _download_ffmpeg.sh |
@@ -304,12 +306,34 @@ When a model is not downloaded, the script returns:
   "error_code": "MODEL_NOT_FOUND",
   "message": "Model 'medium' not found. Please download it first.",
   "model": "medium",
-  "model_size": "1.5GB",
-  "download_command": "./scripts/download-model.sh medium"
+  "model_size": "1.4GB",
+  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1",
+  "download_url": "https://huggingface.co/...",
+  "output_path": "/path/to/models/ggml-medium.bin"
 }
 ```
 
 Run the `download_command` in terminal to download with progress bar.
+
+### Model Corrupted Error
+
+When a model file is corrupted or incomplete (SHA256 mismatch), the script returns:
+
+```json
+{
+  "status": "error",
+  "error_code": "MODEL_CORRUPTED",
+  "message": "Model 'medium' is corrupted or incomplete. Please re-download.",
+  "model": "medium",
+  "model_size": "1.4GB",
+  "expected_sha256": "6c14d5adee5f86394037b4e4e8b59f1673b6cee10e3cf0b11bbdbee79c156208",
+  "actual_sha256": "abc123...",
+  "model_path": "/path/to/models/ggml-medium.bin",
+  "download_command": "rm '/path/to/models/ggml-medium.bin' && curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1"
+}
+```
+
+The `download_command` will remove the corrupted file and re-download it.
 
 ## Performance Tips
 
