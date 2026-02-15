@@ -142,7 +142,7 @@ else
     "model": "$MODEL_NAME",
     "model_size": "$_MODEL_SIZE_HUMAN",
     "model_size_bytes": $_MODEL_SIZE,
-    "download_command": "./scripts/download-model.sh $MODEL_NAME",
+    "download_command": "$SCRIPT_DIR/download-model.sh $MODEL_NAME",
     "download_url": "$_DOWNLOAD_URL"
 }
 EOF
