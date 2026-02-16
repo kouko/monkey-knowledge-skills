@@ -44,7 +44,7 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ## How it Works
 
 1. Execute: `{baseDir}/scripts/transcribe.sh "<audio_file>" "<model>" "<language>"`
-2. Check if model exists (does NOT auto-download)
+2. Auto-download model if not found (with progress)
 3. Convert audio to 16kHz mono WAV using ffmpeg
 4. Run whisper-cli for transcription
 5. Save full JSON to `/tmp/monkey_knowledge/youtube/transcribe/<filename>.json`
@@ -112,31 +112,30 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 }
 ```
 
-**Error (model not found):**
+**Error (unknown model):**
 ```json
 {
   "status": "error",
-  "error_code": "MODEL_NOT_FOUND",
-  "message": "Model 'medium' not found. Please download it first.",
-  "model": "medium",
-  "model_size": "1.4GB",
-  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1",
-  "download_url": "https://huggingface.co/...",
-  "output_path": "/path/to/models/ggml-medium.bin"
+  "error_code": "UNKNOWN_MODEL",
+  "message": "Unknown model: invalid-name",
+  "available_models": ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo", "belle-zh", "kotoba-ja", "kotoba-ja-q5"]
 }
 ```
 
-When you receive `MODEL_NOT_FOUND` error:
-1. Ask user if they want to download the model now using AskUserQuestion tool
-2. If user agrees: execute `download_command` (curl) using Bash tool with `timeout: 600000` (10 minutes), then retry transcription when complete
-3. Progress will be shown in real-time due to `2>&1` redirect in download_command
-4. If user declines: show the same curl command in a code block for manual execution
+When you receive `UNKNOWN_MODEL` error: suggest a valid model from the `available_models` list.
 
-Example flow:
-1. Execute transcribe.sh → receive MODEL_NOT_FOUND
-2. Ask: "Model 'medium' (1.5GB) not found. Download now?"
-3. If yes: run Bash tool with the `download_command` curl command
-4. When complete: retry transcribe.sh
+**Error (download failed):**
+```json
+{
+  "status": "error",
+  "error_code": "DOWNLOAD_FAILED",
+  "message": "Failed to download model 'medium'",
+  "model": "medium",
+  "download_url": "https://huggingface.co/..."
+}
+```
+
+When you receive `DOWNLOAD_FAILED` error: suggest checking network connection and retrying, or running `./scripts/download-model.sh <model>` in terminal.
 
 **Error (model corrupted):**
 ```json
@@ -239,7 +238,7 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 - **Specify language for best results** - enables auto-selection of specialized models (zh→belle-zh, ja→kotoba-ja)
 - Use Read tool to get file content from `file_path` or `text_file_path`
-- **Models must be downloaded before first use** - run `./scripts/download-model.sh <model>` in terminal
+- **Models auto-download on first use** - progress shown in stderr
 - Uses Metal acceleration on macOS for faster processing
 - Supports auto language detection
 - Audio is converted to 16kHz WAV for optimal results
@@ -247,7 +246,7 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 ## Model Download
 
-Models are NOT auto-downloaded. To download a model:
+Models are **auto-downloaded** on first use. For manual download (to see progress bar):
 
 ```bash
 # In terminal (to see progress bar)

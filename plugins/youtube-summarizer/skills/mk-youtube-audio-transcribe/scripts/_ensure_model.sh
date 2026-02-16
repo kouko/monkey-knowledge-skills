@@ -1,8 +1,7 @@
 #!/bin/bash
 # _ensure_model.sh - Ensure whisper model is available
 #
-# Checks if model exists locally. Does NOT auto-download.
-# For downloading, use: ./scripts/download-model.sh <model_name>
+# Checks if model exists locally. Auto-downloads if not found.
 #
 # Usage:
 #   source "$(dirname "$0")/_ensure_model.sh" [model_name]
@@ -11,7 +10,7 @@
 # Exit codes:
 #   0 - Model found and verified (MODEL_PATH is set)
 #   1 - Unknown model (MODEL_ERROR_JSON is set)
-#   2 - Model not found (MODEL_ERROR_JSON is set)
+#   2 - Download failed (MODEL_ERROR_JSON is set)
 #   3 - Model corrupted (MODEL_ERROR_JSON is set)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -47,9 +46,51 @@ else
     _DOWNLOAD_URL=$(get_model_url "$MODEL_NAME")
     _MODEL_SIZE_HUMAN=$(get_model_size_human "$MODEL_NAME")
 
-    # Check if model file exists
-    if [ -f "$_MODEL_PATH_CHECK" ]; then
-        # File exists - verify SHA256
+    # Auto-download if model doesn't exist
+    if [ ! -f "$_MODEL_PATH_CHECK" ]; then
+        echo "[INFO] Model '$MODEL_NAME' not found, downloading... ($_MODEL_SIZE_HUMAN)" >&2
+        mkdir -p "$MODELS_DIR"
+
+        # Download using wget or curl
+        _DOWNLOAD_RESULT=1
+        if command -v wget &> /dev/null; then
+            wget --show-progress -O "$_MODEL_PATH_CHECK" "$_DOWNLOAD_URL" 2>&1 >&2
+            _DOWNLOAD_RESULT=$?
+        elif command -v curl &> /dev/null; then
+            curl -L --progress-bar -o "$_MODEL_PATH_CHECK" "$_DOWNLOAD_URL" 2>&1 >&2
+            _DOWNLOAD_RESULT=$?
+        else
+            MODEL_ERROR_JSON=$(cat <<EOF
+{
+    "error_code": "DOWNLOAD_FAILED",
+    "message": "curl or wget required for download",
+    "model": "$MODEL_NAME"
+}
+EOF
+)
+            _MODEL_EXIT_CODE=2
+        fi
+
+        # Check download result
+        if [ $_MODEL_EXIT_CODE -eq 0 ] && [ "$_DOWNLOAD_RESULT" -ne 0 ]; then
+            rm -f "$_MODEL_PATH_CHECK" 2>/dev/null
+            MODEL_ERROR_JSON=$(cat <<EOF
+{
+    "error_code": "DOWNLOAD_FAILED",
+    "message": "Failed to download model '$MODEL_NAME'",
+    "model": "$MODEL_NAME",
+    "download_url": "$_DOWNLOAD_URL"
+}
+EOF
+)
+            _MODEL_EXIT_CODE=2
+        elif [ $_MODEL_EXIT_CODE -eq 0 ]; then
+            echo "[SUCCESS] Model downloaded: $_MODEL_PATH_CHECK" >&2
+        fi
+    fi
+
+    # Verify model if no error yet
+    if [ $_MODEL_EXIT_CODE -eq 0 ] && [ -f "$_MODEL_PATH_CHECK" ]; then
         _EXPECTED_SHA256=$(get_model_sha256 "$MODEL_NAME")
 
         if [ -z "$_EXPECTED_SHA256" ]; then
@@ -58,12 +99,14 @@ else
             _MODEL_EXIT_CODE=0
         else
             # Calculate local SHA256
+            echo "[INFO] Verifying model integrity..." >&2
             _ACTUAL_SHA256=$(shasum -a 256 "$_MODEL_PATH_CHECK" 2>/dev/null | awk '{print $1}')
 
             if [ "$_ACTUAL_SHA256" = "$_EXPECTED_SHA256" ]; then
                 # SHA256 verified
                 MODEL_PATH="$_MODEL_PATH_CHECK"
                 _MODEL_EXIT_CODE=0
+                echo "[INFO] Model verified: $MODEL_NAME" >&2
             else
                 # SHA256 mismatch - model corrupted or incomplete
                 MODEL_ERROR_JSON=$(cat <<EOF
@@ -82,21 +125,6 @@ EOF
                 _MODEL_EXIT_CODE=3
             fi
         fi
-    else
-        # Model not found
-        MODEL_ERROR_JSON=$(cat <<EOF
-{
-    "error_code": "MODEL_NOT_FOUND",
-    "message": "Model '$MODEL_NAME' not found. Please download it first.",
-    "model": "$MODEL_NAME",
-    "model_size": "$_MODEL_SIZE_HUMAN",
-    "download_command": "curl -L --progress-bar -o '$_MODEL_PATH_CHECK' '$_DOWNLOAD_URL' 2>&1",
-    "download_url": "$_DOWNLOAD_URL",
-    "output_path": "$_MODEL_PATH_CHECK"
-}
-EOF
-)
-        _MODEL_EXIT_CODE=2
     fi
 fi
 

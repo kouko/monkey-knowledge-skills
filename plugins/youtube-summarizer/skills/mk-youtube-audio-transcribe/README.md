@@ -25,7 +25,7 @@ mk-youtube-audio-transcribe/
 └── scripts/
     ├── _ensure_ffmpeg.sh    # Ensures ffmpeg is available
     ├── _ensure_whisper.sh   # Ensures whisper-cli is available
-    ├── _ensure_model.sh     # Checks model exists (no auto-download)
+    ├── _ensure_model.sh     # Auto-downloads models if missing
     ├── _utility__ensure_jq.sh        # Ensures jq is available
     ├── _utility__naming.sh          # Unified naming and metadata functions
     ├── _build_whisper.sh    # Build script for updates
@@ -178,10 +178,15 @@ The JSON file at `file_path` contains:
 
 ## Model Download
 
-Models must be downloaded before first use. Run in terminal to see progress bar:
+Models are **auto-downloaded** on first use. The script will:
+1. Check if model exists in `models/` directory
+2. If not found, automatically download from Hugging Face
+3. Verify SHA256 checksum after download
+
+For manual download (to see progress bar):
 
 ```bash
-# Download a model
+# Download a model manually
 ./scripts/download-model.sh medium      # 1.4GB, general purpose
 ./scripts/download-model.sh belle-zh    # 1.5GB, Chinese-specialized
 ./scripts/download-model.sh kotoba-ja   # 1.4GB, Japanese-specialized
@@ -191,10 +196,7 @@ Models must be downloaded before first use. Run in terminal to see progress bar:
 ./scripts/download-model.sh --list
 ```
 
-Models are saved to `models/` directory. This step is required because:
-- Large model files (up to 2.9GB) need progress feedback
-- Running in terminal shows download progress bar
-- Avoids timeout issues in Claude Code
+Models are saved to `models/` directory.
 
 ## Examples
 
@@ -300,31 +302,42 @@ Automatically detects architecture (Apple Silicon or Intel) and downloads the ap
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `MODEL_NOT_FOUND` | Model not downloaded | Run `./scripts/download-model.sh <model>` |
+| `UNKNOWN_MODEL` | Invalid model name | Use a valid model name from available list |
+| `DOWNLOAD_FAILED` | Model download failed | Check network connection, retry |
 | `MODEL_CORRUPTED` | Model file corrupted or incomplete | Re-download with `download_command` |
 | `File not found` | Invalid path | Check file path |
 | `Transcription failed` | whisper error | Check audio format |
 | `ffmpeg not found` | Missing ffmpeg | Run _download_ffmpeg.sh |
 | `whisper-cli not found` | Missing whisper | Run _build_whisper.sh |
 
-### Model Not Found Error
+### Unknown Model Error
 
-When a model is not downloaded, the script returns:
+When an invalid model name is specified:
 
 ```json
 {
   "status": "error",
-  "error_code": "MODEL_NOT_FOUND",
-  "message": "Model 'medium' not found. Please download it first.",
-  "model": "medium",
-  "model_size": "1.4GB",
-  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1",
-  "download_url": "https://huggingface.co/...",
-  "output_path": "/path/to/models/ggml-medium.bin"
+  "error_code": "UNKNOWN_MODEL",
+  "message": "Unknown model: invalid-name",
+  "available_models": ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo", "belle-zh", "kotoba-ja", "kotoba-ja-q5"]
 }
 ```
 
-Run the `download_command` in terminal to download with progress bar.
+### Download Failed Error
+
+When model auto-download fails:
+
+```json
+{
+  "status": "error",
+  "error_code": "DOWNLOAD_FAILED",
+  "message": "Failed to download model 'medium'",
+  "model": "medium",
+  "download_url": "https://huggingface.co/..."
+}
+```
+
+Check network connection and retry, or run `./scripts/download-model.sh <model>` in terminal to see detailed progress.
 
 ### Model Corrupted Error
 
