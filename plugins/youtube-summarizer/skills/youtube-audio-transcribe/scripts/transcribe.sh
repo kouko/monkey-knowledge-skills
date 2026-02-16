@@ -110,8 +110,16 @@ echo "[INFO] Converting audio to WAV..." >&2
 # Get audio duration
 DURATION=$("$FFMPEG" -i "$AUDIO_FILE" 2>&1 | grep "Duration" | cut -d ' ' -f 4 | sed 's/,//' | cut -d '.' -f 1)
 
+# Detect CPU cores for optimal threading
+CPU_CORES=$(sysctl -n hw.ncpu 2>/dev/null)
+if [ -z "$CPU_CORES" ]; then
+    CPU_CORES=$(nproc 2>/dev/null || echo 4)
+fi
+THREADS=${CPU_CORES:-4}
+echo "[INFO] Using $THREADS threads (detected $CPU_CORES cores)" >&2
+
 # Build whisper command
-WHISPER_ARGS=("-f" "$WAV_FILE" "-m" "$MODEL_PATH" "-oj")
+WHISPER_ARGS=("-f" "$WAV_FILE" "-m" "$MODEL_PATH" "-oj" "-t" "$THREADS")
 
 # Add language option (auto = don't specify, let whisper detect)
 if [ "$LANGUAGE" != "auto" ]; then

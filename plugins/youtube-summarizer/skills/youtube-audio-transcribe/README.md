@@ -342,6 +342,18 @@ The `download_command` will remove the corrupted file and re-download it.
 3. **Audio quality**: Better source audio = better transcription
 4. **Memory**: Ensure enough RAM for chosen model
 
+### Hardware Optimization
+
+The script automatically optimizes for your hardware:
+
+| Feature | Behavior |
+|---------|----------|
+| **CPU Threads** | Auto-detects CPU cores and uses all available threads |
+| **GPU (Metal)** | Enabled by default on macOS |
+| **Flash Attention** | Enabled by default for faster inference |
+
+On Apple Silicon Macs, this typically provides 2-3x speedup compared to the default 4-thread setting.
+
 ## Security
 
 See [MACOS_SECURITY.md](../../../../docs/MACOS_SECURITY.md) for details on macOS Gatekeeper and quarantine behavior.
