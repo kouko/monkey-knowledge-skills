@@ -36,31 +36,32 @@ End-to-end pipeline that summarizes a YouTube video by orchestrating existing sk
 URL
  │
  ▼
-┌──────────────────┐
-│ /mk-youtube-get-info │  ← Step 1: Get metadata + check subtitle availability
-└────────┬─────────┘
-         │
-    ┌────┴────┐
-    │         │
-has_subs   no_subs
-    │         │
-    ▼         ▼
-┌────────┐ ┌──────────┐
-│/get-   │ │/get-audio│  ← Step 2a or 2b
-│caption │ └────┬─────┘
-└───┬────┘       │
-    │            ▼
-    │     ┌────────────┐
-    │     │/audio-     │  ← Step 2c (audio path only)
-    │     │transcribe  │
-    │     └────┬───────┘
-    │          │
-    └────┬─────┘
-         │
-         ▼
-┌──────────────────────┐
-│ /mk-youtube-transcript-summarize  │  ← Step 3: MANDATORY — NEVER SKIP
-└──────────────────────┘
+┌───────────────────────────┐
+│ /mk-youtube-get-info      │  ← Step 1: Get metadata + check subtitle availability
+└────────────┬──────────────┘
+             │
+        ┌────┴────┐
+        │         │
+   has_subs    no_subs
+        │         │
+        ▼         ▼
+┌───────────────┐ ┌─────────────────┐
+│/mk-youtube-   │ │/mk-youtube-     │  ← Step 2a or 2b
+│get-caption    │ │get-audio        │
+└───────┬───────┘ └────────┬────────┘
+        │                  │
+        │                  ▼
+        │         ┌─────────────────┐
+        │         │/mk-youtube-     │  ← Step 2c (audio path only)
+        │         │audio-transcribe │
+        │         └────────┬────────┘
+        │                  │
+        └────────┬─────────┘
+                 │
+                 ▼
+┌────────────────────────────────┐
+│ /mk-youtube-transcript-summarize │  ← Step 3: MANDATORY — NEVER SKIP
+└────────────────────────────────┘
 ```
 
 ## Steps
