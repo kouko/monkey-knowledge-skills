@@ -38,7 +38,7 @@ fi
 # Calculate output summary path
 BASENAME=$(basename "$ABS_PATH")
 BASENAME_NO_EXT="${BASENAME%.*}"
-OUTPUT_SUMMARY="/tmp/youtube-summaries/${BASENAME_NO_EXT}.md"
+OUTPUT_SUMMARY="$MONKEY_KNOWLEDGE_TMP/youtube/summaries/${BASENAME_NO_EXT}.md"
 
 # Extract video ID from filename (format: {YYYYMMDD}__{id}__{title}.{lang}.{ext})
 # Video ID is extracted from position 10-20 (after the date prefix)

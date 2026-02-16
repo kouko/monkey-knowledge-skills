@@ -86,11 +86,11 @@ elif [ $MODEL_EXIT_CODE -ne 0 ]; then
 fi
 
 # Create temp directory for processing
-TEMP_DIR="/tmp/whisper-transcribe-$$"
+TEMP_DIR="$MONKEY_KNOWLEDGE_TMP/build/whisper-transcribe-$$"
 mkdir -p "$TEMP_DIR"
 
 # Output directory (persistent)
-OUTPUT_DIR="/tmp/youtube-audio-transcribe"
+OUTPUT_DIR="$MONKEY_KNOWLEDGE_TMP/youtube/transcribe"
 mkdir -p "$OUTPUT_DIR"
 
 # Generate output filename from audio file (preserving unified naming)

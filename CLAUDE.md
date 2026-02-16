@@ -252,27 +252,40 @@ claude --plugin-dir /path/to/monkey-knowledge-skills/plugins/youtube-summarizer
 
 ### 集中式 Metadata 儲存
 
-所有 YouTube 影片的 metadata 統一儲存於 `/tmp/youtube-video-meta/`，供各 skill 共享存取。
+所有 YouTube 影片的 metadata 統一儲存於 `$TMPDIR/monkey_knowledge/youtube/meta/`，供各 skill 共享存取。
+
+#### 可攜式暫存路徑
+
+暫存目錄使用可攜式偵測，優先順序：
+1. `$TMPDIR`（macOS/Unix 標準）
+2. `$TEMP`（Windows 標準）
+3. `$TMP`（Windows 備用）
+4. `/tmp`（Unix 預設回退）
 
 #### 目錄結構
 
 ```
-/tmp/
-├── youtube-video-meta/           # 集中式 metadata 儲存
-│   └── {YYYYMMDD}__{video_id}__{title}.meta.json
-├── youtube-captions/             # 字幕檔案
-│   └── {YYYYMMDD}__{video_id}__{title}.{lang}.{srt|txt}
-├── youtube-audio/                # 音訊檔案
-│   └── {YYYYMMDD}__{video_id}__{title}.{ext}
-├── youtube-audio-transcribe/     # 轉錄結果
-│   └── {YYYYMMDD}__{video_id}__{title}.{json|txt}
-└── youtube-summaries/            # 摘要檔案
-    └── {YYYYMMDD}__{video_id}__{title}.{lang}.md
+$TMPDIR/monkey_knowledge/        # 或 /tmp/monkey_knowledge/
+├── youtube/
+│   ├── meta/                    # 集中式 metadata 儲存
+│   │   └── {YYYYMMDD}__{video_id}__{title}.meta.json
+│   ├── captions/                # 字幕檔案
+│   │   └── {YYYYMMDD}__{video_id}__{title}.{lang}.{srt|txt}
+│   ├── audio/                   # 音訊檔案
+│   │   └── {YYYYMMDD}__{video_id}__{title}.{ext}
+│   ├── transcribe/              # 轉錄結果
+│   │   └── {YYYYMMDD}__{video_id}__{title}.{json|txt}
+│   └── summaries/               # 摘要檔案
+│       └── {YYYYMMDD}__{video_id}__{title}.{lang}.md
+└── build/                       # 建置過程暫存
+    ├── whisper-cpp-$$/
+    ├── whisper-transcribe-$$/
+    └── ffmpeg-download-$$/
 ```
 
 #### Metadata JSON 格式
 
-`/tmp/youtube-video-meta/{YYYYMMDD}__{video_id}__{title}.meta.json`：
+`$TMPDIR/monkey_knowledge/youtube/meta/{YYYYMMDD}__{video_id}__{title}.meta.json`：
 
 ```json
 {

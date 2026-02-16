@@ -7,7 +7,7 @@ source "$(dirname "$0")/_ensure_jq.sh"
 source "$(dirname "$0")/_naming.sh"
 
 URL="$1"
-OUTPUT_DIR="${2:-/tmp/youtube-audio}"
+OUTPUT_DIR="${2:-$MONKEY_KNOWLEDGE_TMP/youtube/audio}"
 BROWSER="${3:-}"  # Optional: specify browser (chrome, firefox, safari, etc.)
 
 if [ -z "$URL" ]; then

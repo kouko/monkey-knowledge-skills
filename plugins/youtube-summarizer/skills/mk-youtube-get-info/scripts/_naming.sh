@@ -1,7 +1,22 @@
 #!/bin/bash
 # 統一命名規則與 metadata 管理函式
 
-META_DIR="/tmp/youtube-video-meta"
+# Portable temp directory handling
+get_base_tmp() {
+    if [ -n "$TMPDIR" ]; then
+        echo "$TMPDIR"
+    elif [ -n "$TEMP" ]; then
+        echo "$TEMP"
+    elif [ -n "$TMP" ]; then
+        echo "$TMP"
+    else
+        echo "/tmp"
+    fi
+}
+
+# Centralized directories (all skills share monkey_knowledge base)
+MONKEY_KNOWLEDGE_TMP="$(get_base_tmp)/monkey_knowledge"
+META_DIR="$MONKEY_KNOWLEDGE_TMP/youtube/meta"
 
 # 清理標題以用於檔案名稱
 # 用法: sanitize_title "$TITLE" [max_length]

@@ -7,7 +7,7 @@ source "$(dirname "$0")/_naming.sh"
 
 URL="$1"
 LANG="${2:-}"  # Empty means auto-detect original language
-OUTPUT_DIR="/tmp/youtube-captions"
+OUTPUT_DIR="$MONKEY_KNOWLEDGE_TMP/youtube/captions"
 
 if [ -z "$URL" ]; then
     "$JQ" -n --arg status "error" \
