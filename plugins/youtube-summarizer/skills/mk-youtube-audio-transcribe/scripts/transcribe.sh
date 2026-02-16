@@ -109,7 +109,7 @@ if [ $MODEL_EXIT_CODE -eq 2 ]; then
         model_size: .model_size,
         download_url: .download_url,
         download_command: .download_command,
-        hint: "Execute download_command using Bash tool with timeout: 900000 (15 minutes)"
+        hint: "Execute download_command using Bash tool with timeout: 1800000 (30 minutes)"
     }'
     exit 1
 elif [ $MODEL_EXIT_CODE -eq 3 ]; then
@@ -124,7 +124,7 @@ elif [ $MODEL_EXIT_CODE -eq 3 ]; then
         actual_sha256: .actual_sha256,
         model_path: .model_path,
         download_command: .download_command,
-        hint: "Execute download_command using Bash tool with timeout: 900000 (15 minutes)"
+        hint: "Execute download_command using Bash tool with timeout: 1800000 (30 minutes)"
     }'
     exit 1
 elif [ $MODEL_EXIT_CODE -ne 0 ]; then

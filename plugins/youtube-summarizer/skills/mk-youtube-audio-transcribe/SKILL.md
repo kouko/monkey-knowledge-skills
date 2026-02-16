@@ -151,7 +151,7 @@ When you receive `UNKNOWN_MODEL` error: suggest a valid model from the `availabl
 
 When you receive `MODEL_NOT_FOUND` error:
 1. Inform user: "Downloading model '{model}' ({model_size})..."
-2. Execute `download_command` using Bash tool with `timeout: 900000` (15 minutes)
+2. Execute `download_command` using Bash tool with `timeout: 1800000` (30 minutes)
 3. After download completes: re-run the original transcribe command
 
 **Error (model corrupted):**
@@ -171,7 +171,7 @@ When you receive `MODEL_NOT_FOUND` error:
 
 When you receive `MODEL_CORRUPTED` error:
 1. Inform user: "Model '{model}' is corrupted. Re-downloading ({model_size})..."
-2. Execute `download_command` (removes corrupted file and re-downloads) using Bash tool with `timeout: 900000` (15 minutes)
+2. Execute `download_command` (removes corrupted file and re-downloads) using Bash tool with `timeout: 1800000` (30 minutes)
 3. After download completes: re-run the original transcribe command
 
 ## Output Fields
@@ -265,7 +265,7 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 ## Model Download
 
-Models must be downloaded before transcription. When you receive a `MODEL_NOT_FOUND` error, execute the `download_command` with `timeout: 900000`.
+Models must be downloaded before transcription. When you receive a `MODEL_NOT_FOUND` error, execute the `download_command` with `timeout: 1800000`.
 
 ```bash
 # In terminal (to see progress bar)
