@@ -225,8 +225,8 @@ claude --plugin-dir /path/to/monkey-knowledge-skills/plugins/youtube-summarizer
 
 啟動 Claude Code 後：
 1. 執行 `/skills` 查看可用 skills
-2. 應看到 `youtube-search`、`youtube-get-info`、`youtube-get-transcript`、`youtube-get-audio`、`youtube-get-channel-latest`、`transcript-summary`
-3. 使用 `/youtube-search <query>` 測試功能
+2. 應看到 `mk-youtube-search`、`mk-youtube-get-info`、`mk-youtube-get-caption`、`mk-youtube-get-audio`、`mk-youtube-get-channel-latest`、`mk-youtube-audio-transcribe`、`mk-youtube-transcript-summarize`、`mk-youtube-summarize`
+3. 使用 `/mk-youtube-search <query>` 測試功能
 
 ### 開發流程
 
@@ -287,7 +287,9 @@ claude --plugin-dir /path/to/monkey-knowledge-skills/plugins/youtube-summarizer
   "description": "...(前 500 字元)",
   "language": "en",
   "has_subtitles": true,
+  "subtitle_languages": ["en", "ja", "zh-TW"],
   "has_auto_captions": true,
+  "auto_caption_count": 15,
   "source": "get-info",
   "partial": false,
   "fetched_at": "2024-01-15T10:30:00Z"
@@ -401,7 +403,7 @@ write_or_merge_meta "$META_DIR/$BASENAME.meta.json" "$META_JSON" "true"
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-audio/VIDEO_ID__Title.m4a",
+  "file_path": "/tmp/youtube-audio/20091025__dQw4w9WgXcQ__Video_Title.m4a",
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",

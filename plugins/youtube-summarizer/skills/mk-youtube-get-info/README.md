@@ -17,6 +17,7 @@ mk-youtube-get-info/
 └── scripts/
     ├── _ensure_ytdlp.sh  # Ensures yt-dlp is available
     ├── _ensure_jq.sh     # Ensures jq is available
+    ├── _naming.sh        # Unified naming and metadata functions
     └── info.sh           # Main info script
 ```
 
@@ -72,13 +73,19 @@ Priority:
 
 ```json
 {
+  "video_id": "dQw4w9WgXcQ",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
   "duration_string": "10:23",
   "view_count": 1234567,
   "upload_date": "20240101",
   "language": "en",
-  "description": "Video description (truncated to 1000 chars)..."
+  "description": "Video description (truncated to 1000 chars)...",
+  "has_subtitles": true,
+  "subtitle_languages": ["en", "ja", "zh-TW"],
+  "has_auto_captions": true,
+  "auto_caption_count": 15
 }
 ```
 
@@ -86,6 +93,8 @@ Priority:
 
 | Field | Type | Description |
 |-------|------|-------------|
+| video_id | string | YouTube video ID |
+| url | string | Full video URL |
 | title | string | Video title |
 | channel | string | Channel name |
 | duration_string | string | Duration in HH:MM:SS or MM:SS format |
@@ -93,6 +102,10 @@ Priority:
 | upload_date | string | Upload date in YYYYMMDD format |
 | language | string | Video's original language (ISO 639-1 code, e.g., en, ja, ko) |
 | description | string | Description (max 1000 characters) |
+| has_subtitles | boolean | Whether manual subtitles are available |
+| subtitle_languages | array | List of available subtitle language codes |
+| has_auto_captions | boolean | Whether auto-generated captions are available |
+| auto_caption_count | number | Number of auto-caption languages available |
 
 ## Examples
 

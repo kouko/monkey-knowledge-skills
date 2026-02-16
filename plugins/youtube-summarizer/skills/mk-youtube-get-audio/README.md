@@ -20,6 +20,7 @@ mk-youtube-get-audio/
 └── scripts/
     ├── _ensure_ytdlp.sh  # Ensures yt-dlp is available
     ├── _ensure_jq.sh     # Ensures jq is available
+    ├── _naming.sh        # Unified naming and metadata functions
     └── audio.sh          # Main audio download script
 ```
 
@@ -55,8 +56,13 @@ mk-youtube-get-audio/
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-audio/video_title.m4a",
-  "file_size": "5.2M"
+  "file_path": "/tmp/youtube-audio/20240101__VIDEO_ID__Video_Title.m4a",
+  "file_size": "5.2M",
+  "video_id": "dQw4w9WgXcQ",
+  "title": "Video Title",
+  "channel": "Channel Name",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "duration_string": "3:32"
 }
 ```
 
@@ -75,6 +81,11 @@ mk-youtube-get-audio/
 | status | string | "success" or "error" |
 | file_path | string | Absolute path to audio file |
 | file_size | string | Human-readable file size |
+| video_id | string | YouTube video ID |
+| title | string | Video title |
+| channel | string | Channel name |
+| url | string | Video URL |
+| duration_string | string | Video duration (e.g., "3:32") |
 | message | string | Error message (only on failure) |
 
 ## Examples

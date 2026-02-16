@@ -215,14 +215,18 @@ All skills include video metadata in their JSON output when available.
 ```json
 {
   "video_id": "dQw4w9WgXcQ",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
-  "channel_url": "https://www.youtube.com/channel/...",
-  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "duration_string": "10:23",
   "view_count": 1234567,
   "upload_date": "20240101",
-  "description": "Video description (first 500 chars)..."
+  "language": "en",
+  "description": "Video description (first 1000 chars)...",
+  "has_subtitles": true,
+  "subtitle_languages": ["en", "ja", "zh-TW"],
+  "has_auto_captions": true,
+  "auto_caption_count": 15
 }
 ```
 
@@ -235,6 +239,10 @@ All skills include video metadata in their JSON output when available.
   "text_file_path": "/tmp/youtube-captions/20240101__VIDEO_ID__Video_Title.en.txt",
   "language": "en",
   "subtitle_type": "manual",
+  "char_count": 30287,
+  "line_count": 1555,
+  "text_char_count": 25000,
+  "text_line_count": 800,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
@@ -267,6 +275,10 @@ All skills include video metadata in their JSON output when available.
   "language": "en",
   "duration": "3:32",
   "model": "medium",
+  "char_count": 12345,
+  "line_count": 100,
+  "text_char_count": 10000,
+  "text_line_count": 50,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",

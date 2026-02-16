@@ -22,6 +22,7 @@ mk-youtube-get-channel-latest/
 └── scripts/
     ├── _ensure_ytdlp.sh  # Ensures yt-dlp is available
     ├── _ensure_jq.sh     # Ensures jq is available
+    ├── _naming.sh        # Unified naming and metadata functions
     └── channel-latest.sh # Main script
 ```
 

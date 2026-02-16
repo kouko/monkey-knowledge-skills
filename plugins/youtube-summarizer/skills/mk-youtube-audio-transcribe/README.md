@@ -112,17 +112,23 @@ When model is `auto` (default), the script automatically selects the best model 
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/mk-youtube-audio-transcribe/video.json",
-  "text_file_path": "/tmp/mk-youtube-audio-transcribe/video.txt",
+  "file_path": "/tmp/youtube-audio-transcribe/20240101__VIDEO_ID__Video_Title.json",
+  "text_file_path": "/tmp/youtube-audio-transcribe/20240101__VIDEO_ID__Video_Title.txt",
   "language": "en",
   "duration": "3:32",
   "model": "medium",
   "char_count": 12345,
   "line_count": 100,
   "text_char_count": 10000,
-  "text_line_count": 50
+  "text_line_count": 50,
+  "video_id": "dQw4w9WgXcQ",
+  "title": "Video Title",
+  "channel": "Channel Name",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 }
 ```
+
+**Note:** Output filename is derived from input audio filename. Metadata fields (video_id, title, channel, url) are populated from centralized metadata store if available.
 
 **Error:**
 ```json
@@ -145,6 +151,10 @@ When model is `auto` (default), the script automatically selects the best model 
 | `line_count` | Line count of JSON file |
 | `text_char_count` | Character count of plain text file |
 | `text_line_count` | Line count of plain text file |
+| `video_id` | YouTube video ID (from metadata store) |
+| `title` | Video title (from metadata store) |
+| `channel` | Channel name (from metadata store) |
+| `url` | Video URL (from metadata store) |
 
 ### JSON File Format
 
