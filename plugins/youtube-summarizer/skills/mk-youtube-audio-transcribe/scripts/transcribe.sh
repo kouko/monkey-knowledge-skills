@@ -50,6 +50,17 @@ fi
 
 source "$SCRIPT_DIR/_utility__naming.sh"
 
+# --- Parse --force flag from any position ---
+FORCE_REFRESH=false
+ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --force|-f) FORCE_REFRESH=true ;;
+        *) ARGS+=("$arg") ;;
+    esac
+done
+set -- "${ARGS[@]}"
+
 AUDIO_FILE="$1"
 MODEL="${2:-auto}"
 LANGUAGE="${3:-auto}"
@@ -148,6 +159,70 @@ if [ -n "$EXISTING_META" ]; then
     META_URL=$(echo "$EXISTING_META" | "$JQ" -r '.url // empty')
 fi
 
+# --- Cache check (unless --force) ---
+if [ "$FORCE_REFRESH" != "true" ] && [ -n "$VIDEO_ID" ]; then
+    EXISTING_JSON=$(find_file_by_id "$OUTPUT_DIR" "$VIDEO_ID" "*.json")
+    if [ -n "$EXISTING_JSON" ] && [ -f "$EXISTING_JSON" ]; then
+        EXISTING_TXT="${EXISTING_JSON%.json}.txt"
+        echo "[INFO] Using cached transcription: $EXISTING_JSON" >&2
+
+        # Get file statistics
+        CHAR_COUNT=$(wc -c < "$EXISTING_JSON" | tr -d ' ')
+        LINE_COUNT=$(wc -l < "$EXISTING_JSON" | tr -d ' ')
+        TEXT_CHAR_COUNT=0
+        TEXT_LINE_COUNT=0
+        if [ -f "$EXISTING_TXT" ]; then
+            TEXT_CHAR_COUNT=$(wc -c < "$EXISTING_TXT" | tr -d ' ')
+            TEXT_LINE_COUNT=$(wc -l < "$EXISTING_TXT" | tr -d ' ')
+        fi
+
+        # Extract language and model from cached JSON
+        CACHED_LANG=$("$JQ" -r '.language // "unknown"' "$EXISTING_JSON")
+        CACHED_DURATION=$("$JQ" -r '.duration // ""' "$EXISTING_JSON")
+        CACHED_MODEL=$("$JQ" -r '.model // ""' "$EXISTING_JSON")
+
+        "$JQ" -n \
+            --arg file_path "$EXISTING_JSON" \
+            --arg text_file_path "$EXISTING_TXT" \
+            --arg language "$CACHED_LANG" \
+            --arg duration "$CACHED_DURATION" \
+            --arg model "$CACHED_MODEL" \
+            --argjson char_count "$CHAR_COUNT" \
+            --argjson line_count "$LINE_COUNT" \
+            --argjson text_char_count "$TEXT_CHAR_COUNT" \
+            --argjson text_line_count "$TEXT_LINE_COUNT" \
+            --argjson cached true \
+            --arg video_id "$META_VIDEO_ID" \
+            --arg title "$META_TITLE" \
+            --arg channel "$META_CHANNEL" \
+            --arg url "$META_URL" \
+            '{
+                status: "success",
+                file_path: $file_path,
+                text_file_path: $text_file_path,
+                language: $language,
+                duration: $duration,
+                model: $model,
+                char_count: $char_count,
+                line_count: $line_count,
+                text_char_count: $text_char_count,
+                text_line_count: $text_line_count,
+                cached: $cached,
+                video_id: $video_id,
+                title: $title,
+                channel: $channel,
+                url: $url
+            }'
+        exit 0
+    fi
+fi
+
+# --- Force refresh: delete existing files ---
+if [ "$FORCE_REFRESH" = "true" ] && [ -n "$VIDEO_ID" ]; then
+    echo "[INFO] Force refresh enabled, removing existing files..." >&2
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.json "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.txt 2>/dev/null || true
+fi
+
 cleanup() {
     rm -rf "$TEMP_DIR"
 }
@@ -227,6 +302,7 @@ TEXT_LINE_COUNT=$(wc -l < "$TEXT_OUTPUT" | tr -d ' ')
     --argjson line_count "$LINE_COUNT" \
     --argjson text_char_count "$TEXT_CHAR_COUNT" \
     --argjson text_line_count "$TEXT_LINE_COUNT" \
+    --argjson cached false \
     --arg video_id "$META_VIDEO_ID" \
     --arg title "$META_TITLE" \
     --arg channel "$META_CHANNEL" \
@@ -242,6 +318,7 @@ TEXT_LINE_COUNT=$(wc -l < "$TEXT_OUTPUT" | tr -d ' ')
         line_count: $line_count,
         text_char_count: $text_char_count,
         text_line_count: $text_line_count,
+        cached: $cached,
         video_id: $video_id,
         title: $title,
         channel: $channel,

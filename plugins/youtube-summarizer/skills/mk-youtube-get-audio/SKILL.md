@@ -20,7 +20,7 @@ Download video audio file (best available format, no conversion).
 ## Quick Start
 
 ```
-/youtube-get-audio <URL> [output_dir] [browser]
+/youtube-get-audio <URL> [output_dir] [browser] [--force]
 ```
 
 ## Parameters
@@ -30,6 +30,7 @@ Download video audio file (best available format, no conversion).
 | URL | Yes | - | YouTube video URL |
 | output_dir | No | /tmp/monkey_knowledge/youtube/audio | Output directory for audio file |
 | browser | No | auto | Browser for cookies (chrome, firefox, safari, edge, brave) |
+| --force | No | false | Force re-download even if cached file exists |
 
 ## Examples
 
@@ -77,11 +78,23 @@ Success:
   "status": "success",
   "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
   "file_size": "5.2M",
+  "cached": false,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
   "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "duration_string": "3:32"
+}
+```
+
+**Cache hit** (returns existing file):
+```json
+{
+  "status": "success",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
+  "file_size": "5.2M",
+  "cached": true,
+  ...
 }
 ```
 
@@ -125,6 +138,8 @@ Supported browsers:
 
 ## Notes
 
+- **File caching**: If audio file already exists for this video, it will be reused (returns `cached: true`)
+- **Force refresh**: Use `--force` flag to re-download even if cached file exists
 - Uses system yt-dlp/jq if available, otherwise auto-downloads on first run
 - No ffmpeg required (uses best available format without conversion)
 - Output format depends on source (typically m4a, webm, or opus)

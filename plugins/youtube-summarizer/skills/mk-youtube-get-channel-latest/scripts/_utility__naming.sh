@@ -122,3 +122,16 @@ read_meta() {
         cat "$meta_file"
     fi
 }
+
+# 依 video_id 尋找檔案（支援日期前綴格式）
+# 用法: find_file_by_id "$DIR" "$VIDEO_ID" "$PATTERN"
+# 範例: find_file_by_id "$AUDIO_DIR" "dQw4w9WgXcQ" "*.m4a"
+# 輸出: 檔案路徑 或 空字串
+find_file_by_id() {
+    local dir="$1"
+    local video_id="$2"
+    local pattern="${3:-*}"
+    # 格式: YYYYMMDD__VIDEO_ID__TITLE.PATTERN
+    # shellcheck disable=SC2086
+    ls "$dir/"*"__${video_id}__"*${pattern} 2>/dev/null | head -1
+}

@@ -6,6 +6,17 @@ source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
 source "$(dirname "$0")/_utility__naming.sh"
 
+# --- Parse --force flag from any position ---
+FORCE_REFRESH=false
+ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --force|-f) FORCE_REFRESH=true ;;
+        *) ARGS+=("$arg") ;;
+    esac
+done
+set -- "${ARGS[@]}"
+
 URL="$1"
 OUTPUT_DIR="${2:-$MONKEY_KNOWLEDGE_TMP/youtube/audio}"
 BROWSER="${3:-}"  # Optional: specify browser (chrome, firefox, safari, etc.)
@@ -63,8 +74,60 @@ if [ -z "$EXISTING_META" ]; then
     EXISTING_META="$META_JSON"
 fi
 
-# Clean up old files for this video (supports new date-prefixed format)
-rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.{m4a,webm,opus,ogg,mp3,aac,wav} 2>/dev/null || true
+# --- Cache check (unless --force) ---
+if [ "$FORCE_REFRESH" != "true" ]; then
+    EXISTING_AUDIO=$(find_file_by_id "$OUTPUT_DIR" "$VIDEO_ID" "*.{m4a,webm,opus,ogg,mp3,aac,wav}")
+    if [ -z "$EXISTING_AUDIO" ]; then
+        # Try each extension individually (brace expansion doesn't work in find_file_by_id)
+        for ext in m4a webm opus ogg mp3 aac wav; do
+            EXISTING_AUDIO=$(find_file_by_id "$OUTPUT_DIR" "$VIDEO_ID" "*.$ext")
+            [ -n "$EXISTING_AUDIO" ] && break
+        done
+    fi
+    if [ -n "$EXISTING_AUDIO" ] && [ -f "$EXISTING_AUDIO" ]; then
+        echo "[INFO] Using cached audio: $EXISTING_AUDIO" >&2
+        FILE_SIZE=$(ls -lh "$EXISTING_AUDIO" | awk '{print $5}')
+
+        # Extract metadata fields for output
+        META_VIDEO_ID=$(echo "$EXISTING_META" | "$JQ" -r '.video_id // empty')
+        META_TITLE=$(echo "$EXISTING_META" | "$JQ" -r '.title // empty')
+        META_CHANNEL=$(echo "$EXISTING_META" | "$JQ" -r '.channel // empty')
+        META_URL=$(echo "$EXISTING_META" | "$JQ" -r '.url // empty')
+        META_DURATION=$(echo "$EXISTING_META" | "$JQ" -r '.duration_string // empty')
+
+        "$JQ" -n \
+            --arg status "success" \
+            --arg file_path "$EXISTING_AUDIO" \
+            --arg file_size "$FILE_SIZE" \
+            --argjson cached true \
+            --arg video_id "$META_VIDEO_ID" \
+            --arg title "$META_TITLE" \
+            --arg channel "$META_CHANNEL" \
+            --arg url "$META_URL" \
+            --arg duration_string "$META_DURATION" \
+            '{
+                status: $status,
+                file_path: $file_path,
+                file_size: $file_size,
+                cached: $cached,
+                video_id: $video_id,
+                title: $title,
+                channel: $channel,
+                url: $url,
+                duration_string: $duration_string
+            }'
+        exit 0
+    fi
+fi
+
+# --- Force refresh: delete existing files ---
+if [ "$FORCE_REFRESH" = "true" ]; then
+    echo "[INFO] Force refresh enabled, removing existing files..." >&2
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.m4a "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.webm 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.opus "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.ogg 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.mp3 "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.aac 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.wav 2>/dev/null || true
+fi
 
 # Create temp directory for download
 TEMP_DIR=$(mktemp -d)
@@ -175,6 +238,7 @@ if [ -n "$TEMP_FILE" ] && [ -f "$TEMP_FILE" ]; then
         --arg status "success" \
         --arg file_path "$AUDIO_FILE" \
         --arg file_size "$(ls -lh "$AUDIO_FILE" | awk '{print $5}')" \
+        --argjson cached false \
         --arg video_id "$META_VIDEO_ID" \
         --arg title "$META_TITLE" \
         --arg channel "$META_CHANNEL" \
@@ -184,6 +248,7 @@ if [ -n "$TEMP_FILE" ] && [ -f "$TEMP_FILE" ]; then
             status: $status,
             file_path: $file_path,
             file_size: $file_size,
+            cached: $cached,
             video_id: $video_id,
             title: $title,
             channel: $channel,

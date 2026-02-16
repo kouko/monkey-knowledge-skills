@@ -22,7 +22,7 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ## Quick Start
 
 ```
-/youtube-audio-transcribe <audio_file> [model] [language]
+/youtube-audio-transcribe <audio_file> [model] [language] [--force]
 ```
 
 ## Parameters
@@ -32,6 +32,7 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 | audio_file | Yes | - | Path to audio file |
 | model | No | auto | Model: auto, tiny, base, small, medium, large-v3, belle-zh, kotoba-ja |
 | language | No | auto | Language code: en, ja, zh, auto (auto-detect) |
+| --force | No | false | Force re-transcribe even if cached file exists |
 
 ## Examples
 
@@ -97,10 +98,21 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
   "line_count": 100,
   "text_char_count": 10000,
   "text_line_count": 50,
+  "cached": false,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
   "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+}
+```
+
+**Cache hit** (returns existing transcription):
+```json
+{
+  "status": "success",
+  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID__Video_Title.json",
+  "cached": true,
+  ...
 }
 ```
 
@@ -236,6 +248,8 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 ## Notes
 
+- **File caching**: If transcription already exists for this video, it will be reused (returns `cached: true`)
+- **Force refresh**: Use `--force` flag to re-transcribe even if cached file exists
 - **Specify language for best results** - enables auto-selection of specialized models (zh→belle-zh, ja→kotoba-ja)
 - Use Read tool to get file content from `file_path` or `text_file_path`
 - **Models auto-download on first use** - progress shown in stderr

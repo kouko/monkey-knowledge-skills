@@ -20,8 +20,15 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 ## Quick Start
 
 ```
-/mk-youtube-transcript-summarize <transcript_file_path>
+/mk-youtube-transcript-summarize <transcript_file_path> [--force]
 ```
+
+## Parameters
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| transcript_file_path | Yes | - | Path to transcript file (.txt) |
+| --force | No | false | Force re-generate summary even if cached file exists |
 
 ## Examples
 
@@ -213,6 +220,7 @@ Script JSON output:
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard",
+  "cached": false,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
@@ -220,10 +228,26 @@ Script JSON output:
 }
 ```
 
+**Cache hit** (returns existing summary):
+```json
+{
+  "status": "success",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Video_Title.en.md",
+  "cached": true,
+  "summary_char_count": 5000,
+  "summary_line_count": 120,
+  ...
+}
+```
+
+When `cached: true`, the summary file already exists — you may read and display it directly without regenerating.
+
 The script automatically extracts video metadata from the centralized metadata store (`/tmp/monkey_knowledge/youtube/meta/`) if available.
 
 ## Notes
 
+- **File caching**: If summary already exists for this video, it will be reused (returns `cached: true`)
+- **Force refresh**: Use `--force` flag to re-generate summary even if cached file exists
 - This skill does NOT download videos or subtitles — use `/mk-youtube-get-caption` first to obtain a transcript file
 - Uses system jq if available, otherwise auto-downloads on first run
 - For best results, combine with `/mk-youtube-get-info` to include the Video Info table in the summary

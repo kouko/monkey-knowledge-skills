@@ -20,7 +20,7 @@ Download video subtitles and display content. Automatically detects video's orig
 ## Quick Start
 
 ```
-/youtube-get-caption <URL> [language|auto]
+/youtube-get-caption <URL> [language|auto] [--force]
 ```
 
 ## Examples
@@ -29,6 +29,14 @@ Download video subtitles and display content. Automatically detects video's orig
 - `/youtube-get-caption https://youtube.com/watch?v=xxx auto` - Explicitly use original language
 - `/youtube-get-caption https://youtube.com/watch?v=xxx ja` - Download Japanese subtitles
 - `/youtube-get-caption https://youtube.com/watch?v=xxx "zh-TW,en"` - Language priority list
+
+## Parameters
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| URL | Yes | - | YouTube video URL |
+| language | No | auto | Language code or priority list |
+| --force | No | false | Force re-download even if cached file exists |
 
 ## Language Options
 
@@ -62,10 +70,22 @@ Success:
   "line_count": 1555,
   "text_char_count": 25000,
   "text_line_count": 800,
+  "cached": false,
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
   "channel": "Channel Name",
   "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+}
+```
+
+**Cache hit** (returns existing file):
+```json
+{
+  "status": "success",
+  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.srt",
+  "subtitle_type": "cached",
+  "cached": true,
+  ...
 }
 ```
 
@@ -102,6 +122,8 @@ Example: `20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.srt`
 
 ## Notes
 
+- **File caching**: If caption file already exists for this video/language, it will be reused (returns `cached: true`)
+- **Force refresh**: Use `--force` flag to re-download even if cached file exists
 - Uses system yt-dlp/jq if available, otherwise auto-downloads on first run
 - Some videos may not have subtitles
 - Manual subtitles are prioritized over auto-generated ones
