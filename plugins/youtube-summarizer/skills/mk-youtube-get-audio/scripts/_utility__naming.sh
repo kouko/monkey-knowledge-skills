@@ -9,14 +9,8 @@ get_base_tmp() {
             echo "/tmp"
             ;;
         MINGW*|MSYS*|CYGWIN*)
-            # Windows: use Windows temp directory
-            if [ -n "$TEMP" ]; then
-                echo "$TEMP"
-            elif [ -n "$TMP" ]; then
-                echo "$TMP"
-            else
-                echo "/tmp"
-            fi
+            # Windows (Git Bash/MSYS/Cygwin): use fixed /tmp for cache consistency
+            echo "/tmp"
             ;;
         *)
             # Other platforms: fallback to /tmp
