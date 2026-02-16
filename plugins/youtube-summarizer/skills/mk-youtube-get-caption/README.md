@@ -78,8 +78,8 @@ mk-youtube-get-caption/
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-captions/20240101__VIDEO_ID__Video_Title.en.srt",
-  "text_file_path": "/tmp/youtube-captions/20240101__VIDEO_ID__Video_Title.en.txt",
+  "file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.srt",
+  "text_file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt",
   "language": "en",
   "subtitle_type": "manual",
   "char_count": 30287,
@@ -202,8 +202,8 @@ The `subtitle_type` field in the output indicates which type was downloaded.
 
 | Location | Purpose |
 |----------|---------|
-| `/tmp/youtube-captions/{YYYYMMDD}__{video_id}__{title}.{lang}.srt` | Downloaded SRT subtitle files |
-| `/tmp/youtube-captions/{YYYYMMDD}__{video_id}__{title}.{lang}.txt` | Plain text version (no timestamps) |
+| `$TMPDIR/monkey_knowledge/youtube/captions/{YYYYMMDD}__{video_id}__{title}.{lang}.srt` | Downloaded SRT subtitle files |
+| `$TMPDIR/monkey_knowledge/youtube/captions/{YYYYMMDD}__{video_id}__{title}.{lang}.txt` | Plain text version (no timestamps) |
 
 **Note**: Files in `/tmp/` are cleared on system reboot.
 

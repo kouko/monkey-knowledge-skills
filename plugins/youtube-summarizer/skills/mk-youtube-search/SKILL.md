@@ -60,7 +60,7 @@ Search YouTube videos and list results.
 
 1. Execute: `{baseDir}/scripts/search.sh "<query>" <count> <mode>`
 2. Parse JSON output
-3. Write video metadata to centralized store (`/tmp/youtube-video-meta/`)
+3. Write video metadata to centralized store (`$TMPDIR/monkey_knowledge/youtube/meta/`)
 4. Display results in table format
 
 ## Output Format

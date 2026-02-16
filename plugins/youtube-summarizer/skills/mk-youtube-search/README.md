@@ -6,7 +6,7 @@ Search YouTube videos by keyword and return structured results.
 
 This skill uses `yt-dlp` to search YouTube and returns video metadata in JSON format. It supports automatic dependency management - if `yt-dlp` or `jq` is not installed on the system, it will be downloaded automatically.
 
-Search results are saved to the centralized metadata store (`/tmp/youtube-video-meta/`) for use by other skills in the pipeline.
+Search results are saved to the centralized metadata store (`$TMPDIR/monkey_knowledge/youtube/meta/`) for use by other skills in the pipeline.
 
 ## File Structure
 
@@ -176,13 +176,13 @@ Priority:
                                  ▼
                    ┌─────────────────────────────┐
                    │ Write metadata (full only)  │
-                   │ /tmp/youtube-video-meta/    │
+                   │ $TMPDIR/monkey_knowledge/youtube/meta/    │
                    └─────────────────────────────┘
 ```
 
 ## Centralized Metadata Storage
 
-Search results are saved to `/tmp/youtube-video-meta/` with `partial: true` flag.
+Search results are saved to `$TMPDIR/monkey_knowledge/youtube/meta/` with `partial: true` flag.
 
 **Note:** Metadata is only written in `full` mode (since `fast` mode lacks `upload_date` required for filename).
 

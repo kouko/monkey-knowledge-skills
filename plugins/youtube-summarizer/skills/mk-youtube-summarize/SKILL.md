@@ -144,13 +144,13 @@ The output is a JSON array of video objects. For each video in the array, execut
 Processing 3 videos from @RickAstleyYT...
 
 [1/3] Rick Astley - Never Gonna Give You Up
-→ Summary: /tmp/youtube-summaries/20091025__dQw4w9WgXcQ__...md
+→ Summary: $TMPDIR/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__...md
 
 [2/3] Rick Astley - Together Forever
-→ Summary: /tmp/youtube-summaries/19880201__xyz123__...md
+→ Summary: $TMPDIR/monkey_knowledge/youtube/summaries/19880201__xyz123__...md
 
 [3/3] Rick Astley - Take Me to Your Heart
-→ Summary: /tmp/youtube-summaries/19880815__abc456__...md
+→ Summary: $TMPDIR/monkey_knowledge/youtube/summaries/19880815__abc456__...md
 
 ✅ Completed: 3/3 summaries generated
 ```

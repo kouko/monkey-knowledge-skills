@@ -47,7 +47,7 @@ mk-youtube-get-audio/
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
 | URL | Yes | - | YouTube video URL |
-| output_dir | No | /tmp/youtube-audio/ | Output directory |
+| output_dir | No | $TMPDIR/monkey_knowledge/youtube/audio/ | Output directory |
 | browser | No | auto | Browser for cookies (chrome, firefox, safari, edge, brave) |
 
 ### Output Format (JSON)
@@ -56,7 +56,7 @@ mk-youtube-get-audio/
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-audio/20240101__VIDEO_ID__Video_Title.m4a",
+  "file_path": "$TMPDIR/monkey_knowledge/youtube/audio/20240101__VIDEO_ID__Video_Title.m4a",
   "file_size": "5.2M",
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
@@ -213,7 +213,7 @@ The script downloads audio in the best available format without conversion:
 
 | Directory | Persistence | Notes |
 |-----------|-------------|-------|
-| `/tmp/youtube-audio/` | Until reboot | Default location |
+| `$TMPDIR/monkey_knowledge/youtube/audio/` | Until reboot | Default location |
 | `~/Music/` | Permanent | Recommended for keeping |
 | Custom path | Permanent | User-specified |
 
@@ -247,10 +247,10 @@ yt-dlp --cookies-from-browser "chrome:Profile 1" --list-formats "URL"
 
 ```bash
 # Check output directory permissions
-ls -la /tmp/youtube-audio/
+ls -la $TMPDIR/monkey_knowledge/youtube/audio/
 
 # Create directory if needed
-mkdir -p /tmp/youtube-audio/
+mkdir -p $TMPDIR/monkey_knowledge/youtube/audio/
 ```
 
 ### Disk space

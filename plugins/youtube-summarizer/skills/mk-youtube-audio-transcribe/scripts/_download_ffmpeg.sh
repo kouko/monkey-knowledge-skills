@@ -12,6 +12,21 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="$SCRIPT_DIR/../bin"
 
+# Portable temp directory handling
+get_base_tmp() {
+    if [ -n "$TMPDIR" ]; then
+        echo "$TMPDIR"
+    elif [ -n "$TEMP" ]; then
+        echo "$TEMP"
+    elif [ -n "$TMP" ]; then
+        echo "$TMP"
+    else
+        echo "/tmp"
+    fi
+}
+
+MONKEY_KNOWLEDGE_TMP="$(get_base_tmp)/monkey_knowledge"
+
 # Only support macOS
 if [ "$(uname -s)" != "Darwin" ]; then
     echo "ERROR: This script is for macOS only" >&2
@@ -44,7 +59,7 @@ download_ffmpeg() {
     echo "[INFO] Downloading ffmpeg..." >&2
     mkdir -p "$BIN_DIR"
 
-    local temp_dir="/tmp/ffmpeg-download-$$"
+    local temp_dir="$MONKEY_KNOWLEDGE_TMP/build/ffmpeg-download-$$"
     mkdir -p "$temp_dir"
 
     # Download from martin-riedl.de (signed & notarized)
