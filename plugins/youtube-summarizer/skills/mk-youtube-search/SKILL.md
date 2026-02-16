@@ -1,5 +1,5 @@
 ---
-name: youtube-search
+name: mk-youtube-search
 description: Search YouTube videos. Use when user wants to find videos by keyword or topic.
 license: MIT
 metadata:

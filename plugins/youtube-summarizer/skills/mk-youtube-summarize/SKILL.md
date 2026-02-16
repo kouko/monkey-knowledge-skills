@@ -1,5 +1,5 @@
 ---
-name: youtube-summarize
+name: mk-youtube-summarize
 description: Summarize a YouTube video end-to-end. Use when user wants to summarize, recap, or get key points from a YouTube URL.
 license: MIT
 metadata:
@@ -20,14 +20,14 @@ End-to-end pipeline that summarizes a YouTube video by orchestrating existing sk
 ## Quick Start
 
 ```
-/youtube-summarize <URL>
+/mk-youtube-summarize <URL>
 ```
 
 ## Examples
 
 ```
-/youtube-summarize https://www.youtube.com/watch?v=dQw4w9WgXcQ
-/youtube-summarize https://youtu.be/dQw4w9WgXcQ
+/mk-youtube-summarize https://www.youtube.com/watch?v=dQw4w9WgXcQ
+/mk-youtube-summarize https://youtu.be/dQw4w9WgXcQ
 ```
 
 ## Pipeline Flow
@@ -37,7 +37,7 @@ URL
  │
  ▼
 ┌──────────────────┐
-│ /youtube-get-info │  ← Step 1: Get metadata + check subtitle availability
+│ /mk-youtube-get-info │  ← Step 1: Get metadata + check subtitle availability
 └────────┬─────────┘
          │
     ┌────┴────┐
@@ -59,7 +59,7 @@ has_subs   no_subs
          │
          ▼
 ┌──────────────────────┐
-│ /transcript-summarize  │  ← Step 3: MANDATORY — NEVER SKIP
+│ /mk-youtube-transcript-summarize  │  ← Step 3: MANDATORY — NEVER SKIP
 └──────────────────────┘
 ```
 
@@ -67,10 +67,10 @@ has_subs   no_subs
 
 ### Step 1: Get Video Info
 
-Use the Skill tool to invoke `/youtube-get-info` with the URL:
+Use the Skill tool to invoke `/mk-youtube-get-info` with the URL:
 
 ```
-/youtube-get-info <URL>
+/mk-youtube-get-info <URL>
 ```
 
 From the output, note:
@@ -83,26 +83,26 @@ Choose ONE path based on subtitle availability from Step 1:
 
 #### Path A — Subtitles available (`has_subtitles: true` OR `has_auto_captions: true`)
 
-Use the Skill tool to invoke `/youtube-get-caption`:
+Use the Skill tool to invoke `/mk-youtube-get-caption`:
 
 ```
-/youtube-get-caption <URL>
+/mk-youtube-get-caption <URL>
 ```
 
 Save the `text_file_path` from the output for Step 3.
 
 #### Path B — No subtitles (`has_subtitles: false` AND `has_auto_captions: false`)
 
-First, use the Skill tool to invoke `/youtube-get-audio`:
+First, use the Skill tool to invoke `/mk-youtube-get-audio`:
 
 ```
-/youtube-get-audio <URL>
+/mk-youtube-get-audio <URL>
 ```
 
-Then, use the Skill tool to invoke `/youtube-audio-transcribe` with the `file_path` from the audio output:
+Then, use the Skill tool to invoke `/mk-youtube-audio-transcribe` with the `file_path` from the audio output:
 
 ```
-/youtube-audio-transcribe <file_path> auto <language>
+/mk-youtube-audio-transcribe <file_path> auto <language>
 ```
 
 Pass the `language` from Step 1 for best model auto-selection (e.g., `zh` → belle-zh, `ja` → kotoba-ja).
@@ -111,13 +111,13 @@ Save the `text_file_path` from the output for Step 3.
 
 ### Step 3: Generate Summary — MANDATORY — NEVER SKIP
 
-Use the Skill tool to invoke `/transcript-summarize` with the `text_file_path` obtained from Step 2:
+Use the Skill tool to invoke `/mk-youtube-transcript-summarize` with the `text_file_path` obtained from Step 2:
 
 ```
-/transcript-summarize <text_file_path>
+/mk-youtube-transcript-summarize <text_file_path>
 ```
 
-**CRITICAL**: You MUST use the Skill tool to invoke `/transcript-summarize`. Do NOT generate summaries directly. The skill contains critical rules for:
+**CRITICAL**: You MUST use the Skill tool to invoke `/mk-youtube-transcript-summarize`. Do NOT generate summaries directly. The skill contains critical rules for:
 - Compression ratio calibration
 - Section structure requirements
 - Numerical data preservation

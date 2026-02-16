@@ -6,11 +6,14 @@ Claude Code plugin for YouTube video tools - search, info, transcript, audio dow
 
 | Skill | Description | Usage |
 |-------|-------------|-------|
-| `/youtube-search` | Search YouTube videos | `/youtube-search <query> [count]` |
-| `/youtube-info` | Get video info and summary | `/youtube-info <url>` |
-| `/youtube-caption` | Download subtitles | `/youtube-caption <url> [lang]` |
-| `/youtube-audio` | Download audio (MP3) | `/youtube-audio <url> [output_dir]` |
-| `/transcript-summarize` | Structured video summary | `/transcript-summarize <transcript_file_path>` |
+| `/mk-youtube-search` | Search YouTube videos | `/mk-youtube-search <query> [count]` |
+| `/mk-youtube-get-info` | Get video info and summary | `/mk-youtube-get-info <url>` |
+| `/mk-youtube-get-caption` | Download subtitles | `/mk-youtube-get-caption <url> [lang]` |
+| `/mk-youtube-get-audio` | Download audio | `/mk-youtube-get-audio <url> [output_dir]` |
+| `/mk-youtube-get-channel-latest` | Get latest channel videos | `/mk-youtube-get-channel-latest <channel> [type] [count]` |
+| `/mk-youtube-audio-transcribe` | Transcribe audio to text | `/mk-youtube-audio-transcribe <audio_file> [model] [lang]` |
+| `/mk-youtube-transcript-summarize` | Structured video summary | `/mk-youtube-transcript-summarize <transcript_file_path>` |
+| `/mk-youtube-summarize` | End-to-end video summarization | `/mk-youtube-summarize <url>` |
 
 ## Features
 
@@ -27,44 +30,14 @@ plugins/youtube-summarizer/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── skills/
-│   ├── youtube-search/
-│   │   ├── SKILL.md
-│   │   ├── README.md
-│   │   ├── bin/
-│   │   └── scripts/
-│   │       ├── _ensure_ytdlp.sh
-│   │       ├── _ensure_jq.sh
-│   │       └── search.sh
-│   ├── youtube-info/
-│   │   ├── SKILL.md
-│   │   ├── README.md
-│   │   ├── bin/
-│   │   └── scripts/
-│   │       ├── _ensure_ytdlp.sh
-│   │       ├── _ensure_jq.sh
-│   │       └── info.sh
-│   ├── youtube-caption/
-│   │   ├── SKILL.md
-│   │   ├── README.md
-│   │   ├── bin/
-│   │   └── scripts/
-│   │       ├── _ensure_ytdlp.sh
-│   │       └── caption.sh
-│   ├── youtube-audio/
-│   │   ├── SKILL.md
-│   │   ├── README.md
-│   │   ├── bin/
-│   │   └── scripts/
-│   │       ├── _ensure_ytdlp.sh
-│   │       ├── _ensure_jq.sh
-│   │       └── audio.sh
-│   └── transcript-summarize/
-│       ├── SKILL.md
-│       ├── README.md
-│       ├── bin/
-│       └── scripts/
-│           ├── _ensure_jq.sh
-│           └── summary.sh
+│   ├── mk-youtube-search/
+│   ├── mk-youtube-get-info/
+│   ├── mk-youtube-get-caption/
+│   ├── mk-youtube-get-audio/
+│   ├── mk-youtube-get-channel-latest/
+│   ├── mk-youtube-audio-transcribe/
+│   ├── mk-youtube-transcript-summarize/
+│   └── mk-youtube-summarize/
 └── README.md
 ```
 
@@ -124,7 +97,7 @@ plugins/youtube-summarizer/
 
 ## Output Formats
 
-### youtube-search
+### mk-youtube-search
 
 ```json
 [
@@ -137,7 +110,7 @@ plugins/youtube-summarizer/
 ]
 ```
 
-### youtube-info
+### mk-youtube-get-info
 
 ```json
 {
@@ -150,18 +123,19 @@ plugins/youtube-summarizer/
 }
 ```
 
-### youtube-caption
+### mk-youtube-get-caption
 
 ```json
 {
   "status": "success",
   "file_path": "/tmp/youtube-captions/VIDEO_ID.en.srt",
+  "text_file_path": "/tmp/youtube-captions/VIDEO_ID.en.txt",
   "language": "en",
-  "content": "transcript text content..."
+  "subtitle_type": "manual"
 }
 ```
 
-### youtube-audio
+### mk-youtube-get-audio
 
 ```json
 {
@@ -171,12 +145,13 @@ plugins/youtube-summarizer/
 }
 ```
 
-### transcript-summarize
+### mk-youtube-transcript-summarize
 
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "source_transcript": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "output_summary": "/tmp/youtube-summaries/VIDEO_ID.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard"
@@ -197,65 +172,74 @@ plugins/youtube-summarizer/
 
 ```bash
 # Search for videos
-/youtube-search "AI tutorial" 5
+/mk-youtube-search "AI tutorial" 5
 
-# Get video info and summary
-/youtube-info https://www.youtube.com/watch?v=dQw4w9WgXcQ
+# Get video info
+/mk-youtube-get-info https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 # Download subtitles (English)
-/youtube-caption https://www.youtube.com/watch?v=xxx
+/mk-youtube-get-caption https://www.youtube.com/watch?v=xxx
 
 # Download subtitles (Japanese)
-/youtube-caption https://www.youtube.com/watch?v=xxx ja
+/mk-youtube-get-caption https://www.youtube.com/watch?v=xxx ja
 
 # Download audio to default location
-/youtube-audio https://www.youtube.com/watch?v=xxx
+/mk-youtube-get-audio https://www.youtube.com/watch?v=xxx
 
 # Download audio to custom location
-/youtube-audio https://www.youtube.com/watch?v=xxx ~/Music
+/mk-youtube-get-audio https://www.youtube.com/watch?v=xxx ~/Music
 
-# Summarize from a transcript file (typical two-step workflow)
-/youtube-caption https://www.youtube.com/watch?v=xxx
-/transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
+# End-to-end summarization (recommended)
+/mk-youtube-summarize https://www.youtube.com/watch?v=xxx
 
-# Summarize with metadata (three-step workflow)
-/youtube-info https://www.youtube.com/watch?v=xxx
-/youtube-caption https://www.youtube.com/watch?v=xxx
-/transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
+# Manual workflow: caption → summarize
+/mk-youtube-get-caption https://www.youtube.com/watch?v=xxx
+/mk-youtube-transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
 ```
 
 ## Workflow: Video Summarization
 
+### Recommended: End-to-end Pipeline
+
 ```
-┌──────────────────┐
-│ /youtube-search  │ ← Find videos by keyword
-└────────┬─────────┘
+/mk-youtube-summarize <URL>
          │
          ▼
-┌──────────────────┐   ┌──────────────────┐
-│ /youtube-info    │   │/youtube-caption│ ← Run independently
-│ (optional)       │   │ (required)       │
-└────────┬─────────┘   └────────┬─────────┘
-         │                      │
-         │  metadata in         │  transcript
-         │  conversation        │  file path
-         │  context             │
-         └──────────┬───────────┘
+┌────────────────────────────────────────────────────────┐
+│ Automatically orchestrates: get-info → get-caption/   │
+│ get-audio → audio-transcribe → transcript-summarize   │
+└────────────────────────────────────────────────────────┘
+```
+
+### Manual Workflow
+
+```
+┌────────────────────────┐
+│ /mk-youtube-search     │ ← Find videos by keyword
+└──────────┬─────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│ /mk-youtube-get-info   │ ← Get metadata + check subtitle availability
+└──────────┬─────────────┘
+           │
+     ┌─────┴─────┐
+     │           │
+has_subs      no_subs
+     │           │
+     ▼           ▼
+┌─────────────┐ ┌─────────────────────────────────┐
+│/mk-youtube- │ │/mk-youtube-get-audio            │
+│get-caption  │ │  ↓                              │
+└──────┬──────┘ │/mk-youtube-audio-transcribe     │
+       │        └───────────────┬─────────────────┘
+       └────────────┬───────────┘
                     │
                     ▼
-           ┌──────────────┐
-           │/youtube-      │ ← Pass transcript file path
-           │ summary       │
-           └──────┬───────┘
-                  │
-                  ▼
-           ┌──────────────┐
-           │  Structured  │
-           │  AI Summary  │
-           └──────────────┘
-
-Alternative (for videos without subtitles):
-  /youtube-audio → Speech-to-Text → /transcript-summarize (inline text)
+       ┌────────────────────────────┐
+       │/mk-youtube-transcript-     │
+       │summarize                   │
+       └────────────────────────────┘
 ```
 
 ## Troubleshooting

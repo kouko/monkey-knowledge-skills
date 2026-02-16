@@ -1,5 +1,5 @@
 ---
-name: youtube-get-audio
+name: mk-youtube-get-audio
 description: Download YouTube video audio file. Use when user wants to extract audio or download music/podcast from a video.
 license: MIT
 metadata:
@@ -122,10 +122,10 @@ Supported browsers:
 
 ## Next Step
 
-After downloading the audio, invoke `/youtube-audio-transcribe` with the `file_path` from the output:
+After downloading the audio, invoke `/mk-youtube-audio-transcribe` with the `file_path` from the output:
 
 ```
-/youtube-audio-transcribe <file_path> [model] [language]
+/mk-youtube-audio-transcribe <file_path> [model] [language]
 ```
 
-**Tip**: If you know the video's language from `/youtube-get-info`, pass it as the language parameter for better model auto-selection (e.g., `zh` → belle-zh, `ja` → kotoba-ja).
+**Tip**: If you know the video's language from `/mk-youtube-get-info`, pass it as the language parameter for better model auto-selection (e.g., `zh` → belle-zh, `ja` → kotoba-ja).

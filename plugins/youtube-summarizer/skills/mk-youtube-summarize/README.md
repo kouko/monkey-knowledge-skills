@@ -7,7 +7,7 @@ A pure orchestration skill that summarizes a YouTube video end-to-end by invokin
 ## File Structure
 
 ```
-youtube-summarize/
+mk-youtube-summarize/
 ├── SKILL.md        # Pipeline definition (instructions only)
 └── README.md       # This file
 ```
@@ -18,11 +18,11 @@ This skill depends on the following sub-skills (all part of the `youtube-summari
 
 | Skill | Role | When Used |
 |-------|------|-----------|
-| `youtube-get-info` | Get video metadata | Always (Step 1) |
-| `youtube-get-caption` | Download subtitles | When subtitles available (Step 2a) |
-| `youtube-get-audio` | Download audio | When no subtitles (Step 2b) |
-| `youtube-audio-transcribe` | Transcribe audio | When no subtitles (Step 2c) |
-| `transcript-summarize` | Generate summary | Always (Step 3) |
+| `mk-youtube-get-info` | Get video metadata | Always (Step 1) |
+| `mk-youtube-get-caption` | Download subtitles | When subtitles available (Step 2a) |
+| `mk-youtube-get-audio` | Download audio | When no subtitles (Step 2b) |
+| `mk-youtube-audio-transcribe` | Transcribe audio | When no subtitles (Step 2c) |
+| `mk-youtube-transcript-summarize` | Generate summary | Always (Step 3) |
 
 ## How It Works
 
@@ -34,17 +34,17 @@ URL ──▶ get-info ──▶ has subtitles? ──┬── YES ──▶ ge
 
 ### Decision Logic
 
-1. **Step 1** (`/youtube-get-info`): Retrieve video metadata including `has_subtitles` and `has_auto_captions`
+1. **Step 1** (`/mk-youtube-get-info`): Retrieve video metadata including `has_subtitles` and `has_auto_captions`
 2. **Step 2**: Branch based on subtitle availability
-   - **Path A**: If subtitles exist → `/youtube-get-caption`
-   - **Path B**: If no subtitles → `/youtube-get-audio` → `/youtube-audio-transcribe`
-3. **Step 3** (`/transcript-summarize`): Always invoked via Skill tool — never skipped
+   - **Path A**: If subtitles exist → `/mk-youtube-get-caption`
+   - **Path B**: If no subtitles → `/mk-youtube-get-audio` → `/mk-youtube-audio-transcribe`
+3. **Step 3** (`/mk-youtube-transcript-summarize`): Always invoked via Skill tool — never skipped
 
 ## Examples
 
 ```
-/youtube-summarize https://www.youtube.com/watch?v=dQw4w9WgXcQ
-/youtube-summarize https://youtu.be/dQw4w9WgXcQ
+/mk-youtube-summarize https://www.youtube.com/watch?v=dQw4w9WgXcQ
+/mk-youtube-summarize https://youtu.be/dQw4w9WgXcQ
 ```
 
 ## Error Handling

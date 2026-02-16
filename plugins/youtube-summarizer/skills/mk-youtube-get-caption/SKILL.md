@@ -1,5 +1,5 @@
 ---
-name: youtube-get-caption
+name: mk-youtube-get-caption
 description: Download YouTube video subtitles. Use when user wants to get captions or subtitles from a video.
 license: MIT
 metadata:
@@ -95,10 +95,10 @@ Error:
 
 ## Next Step
 
-After downloading the caption, invoke `/transcript-summarize` with the `text_file_path` from the output to generate a structured summary:
+After downloading the caption, invoke `/mk-youtube-transcript-summarize` with the `text_file_path` from the output to generate a structured summary:
 
 ```
-/transcript-summarize <text_file_path>
+/mk-youtube-transcript-summarize <text_file_path>
 ```
 
-**IMPORTANT**: Always use the Skill tool to invoke `/transcript-summarize`. Do NOT generate summaries directly without loading the skill — it contains critical rules for compression ratio, section structure, data preservation, and language handling.
+**IMPORTANT**: Always use the Skill tool to invoke `/mk-youtube-transcript-summarize`. Do NOT generate summaries directly without loading the skill — it contains critical rules for compression ratio, section structure, data preservation, and language handling.

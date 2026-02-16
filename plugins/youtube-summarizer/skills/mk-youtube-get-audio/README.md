@@ -12,7 +12,7 @@ This skill extracts audio from YouTube videos using `yt-dlp`. It supports:
 ## File Structure
 
 ```
-youtube-get-audio/
+mk-youtube-get-audio/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)

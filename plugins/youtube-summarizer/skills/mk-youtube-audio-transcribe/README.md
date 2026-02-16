@@ -13,7 +13,7 @@ This skill converts audio files to text using OpenAI's Whisper model (via whispe
 ## File Structure
 
 ```
-youtube-audio-transcribe/
+mk-youtube-audio-transcribe/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Pre-built binaries (macOS)
@@ -112,8 +112,8 @@ When model is `auto` (default), the script automatically selects the best model 
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-audio-transcribe/video.json",
-  "text_file_path": "/tmp/youtube-audio-transcribe/video.txt",
+  "file_path": "/tmp/mk-youtube-audio-transcribe/video.json",
+  "text_file_path": "/tmp/mk-youtube-audio-transcribe/video.txt",
   "language": "en",
   "duration": "3:32",
   "model": "medium",

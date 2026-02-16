@@ -1,5 +1,5 @@
 ---
-name: youtube-audio-transcribe
+name: mk-youtube-audio-transcribe
 description: Transcribe audio to text using local whisper.cpp. Use when user wants to convert audio/video to text, get transcription, or speech-to-text.
 license: MIT
 metadata:
@@ -245,10 +245,10 @@ Models are NOT auto-downloaded. To download a model:
 
 ## Next Step
 
-After transcription completes, invoke `/transcript-summarize` with the `text_file_path` from the output to generate a structured summary:
+After transcription completes, invoke `/mk-youtube-transcript-summarize` with the `text_file_path` from the output to generate a structured summary:
 
 ```
-/transcript-summarize <text_file_path>
+/mk-youtube-transcript-summarize <text_file_path>
 ```
 
-**IMPORTANT**: Always use the Skill tool to invoke `/transcript-summarize`. Do NOT generate summaries directly without loading the skill — it contains critical rules for compression ratio, section structure, data preservation, and language handling.
+**IMPORTANT**: Always use the Skill tool to invoke `/mk-youtube-transcript-summarize`. Do NOT generate summaries directly without loading the skill — it contains critical rules for compression ratio, section structure, data preservation, and language handling.

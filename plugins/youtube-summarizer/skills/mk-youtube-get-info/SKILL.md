@@ -1,5 +1,5 @@
 ---
-name: youtube-get-info
+name: mk-youtube-get-info
 description: Get YouTube video metadata (title, channel, duration, views, subtitle availability). Use when user wants video details or needs to check subtitle availability before summarization.
 license: MIT
 metadata:
@@ -20,13 +20,13 @@ Get video details and generate content summary.
 ## Quick Start
 
 ```
-/youtube-get-info <URL>
+/mk-youtube-get-info <URL>
 ```
 
 ## Examples
 
 ```
-/youtube-get-info https://www.youtube.com/watch?v=dQw4w9WgXcQ
+/mk-youtube-get-info https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ```
 
 ## How it Works
@@ -85,7 +85,7 @@ Get video details and generate content summary.
 
 After obtaining video info, determine the summarization path based on subtitle availability:
 
-- **If `has_subtitles: true` or `has_auto_captions: true`**: Invoke `/youtube-get-caption` to download subtitles
-- **If both are `false`**: Invoke `/youtube-get-audio` to download audio for transcription
+- **If `has_subtitles: true` or `has_auto_captions: true`**: Invoke `/mk-youtube-get-caption` to download subtitles
+- **If both are `false`**: Invoke `/mk-youtube-get-audio` to download audio for transcription
 
 To generate a complete summary, always follow the full pipeline — do NOT skip directly to summarization without first obtaining a transcript through one of the above paths.

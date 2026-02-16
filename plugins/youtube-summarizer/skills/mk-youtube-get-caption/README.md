@@ -13,7 +13,7 @@ This skill downloads subtitles from YouTube videos using `yt-dlp` and outputs JS
 ## File Structure
 
 ```
-youtube-get-caption/
+mk-youtube-get-caption/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)
@@ -210,7 +210,7 @@ The `subtitle_type` field in the output indicates which type was downloaded.
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `ERROR: No subtitles found` | Video has no captions | Use `/youtube-get-audio` for speech-to-text |
+| `ERROR: No subtitles found` | Video has no captions | Use `/mk-youtube-get-audio` for speech-to-text |
 | Empty output | Subtitle download failed | Check video URL and language |
 | Wrong language | Requested language unavailable | Try different language code or use `auto` |
 
@@ -218,7 +218,7 @@ The `subtitle_type` field in the output indicates which type was downloaded.
 
 If a video has no subtitles:
 
-1. Use `/youtube-get-audio` to download audio
+1. Use `/mk-youtube-get-audio` to download audio
 2. Use external speech-to-text service
 3. Manually transcribe content
 

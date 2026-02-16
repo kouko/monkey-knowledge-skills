@@ -1,5 +1,5 @@
 ---
-name: transcript-summarize
+name: mk-youtube-transcript-summarize
 description: Summarize YouTube video content with structured output. Use when user wants a detailed summary from a transcript file path.
 license: MIT
 metadata:
@@ -20,21 +20,21 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 ## Quick Start
 
 ```
-/transcript-summarize <transcript_file_path>
+/mk-youtube-transcript-summarize <transcript_file_path>
 ```
 
 ## Examples
 
-- `/transcript-summarize /tmp/youtube-captions/dQw4w9WgXcQ.en.txt`
-- `/transcript-summarize /tmp/youtube-audio-transcribe/video.txt`
+- `/mk-youtube-transcript-summarize /tmp/youtube-captions/dQw4w9WgXcQ.en.txt`
+- `/mk-youtube-transcript-summarize /tmp/youtube-audio-transcribe/video.txt`
 
 **Typical workflow:**
 
 ```
-/youtube-get-caption https://youtube.com/watch?v=xxx
+/mk-youtube-get-caption https://youtube.com/watch?v=xxx
 → outputs transcript file path
 
-/transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
+/mk-youtube-transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
 → generates structured summary
 ```
 
@@ -137,7 +137,7 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
 ### Video Info Table
 
-- **Include** the Video Info table if `/youtube-get-info` results are available in the current conversation context
+- **Include** the Video Info table if `/mk-youtube-get-info` results are available in the current conversation context
 - **Omit** the table if no metadata is available (proceed directly to Content Summary)
 
 ### Content Rules
@@ -207,7 +207,7 @@ Script JSON output:
 
 ## Notes
 
-- This skill does NOT download videos or subtitles — use `/youtube-get-caption` first to obtain a transcript file
+- This skill does NOT download videos or subtitles — use `/mk-youtube-get-caption` first to obtain a transcript file
 - On first run, if jq is not installed, it will be auto-downloaded
-- For best results, combine with `/youtube-get-info` to include the Video Info table in the summary
+- For best results, combine with `/mk-youtube-get-info` to include the Video Info table in the summary
 - Summary is automatically saved to `/tmp/youtube-summaries/` directory

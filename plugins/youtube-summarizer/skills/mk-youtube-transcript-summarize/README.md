@@ -4,12 +4,12 @@ Generate structured, high-quality summaries of YouTube videos from transcript te
 
 ## Overview
 
-This skill takes a transcript file path (or inline text) and produces a consistent, structured summary. It is fully independent — no dependency on sibling skills. Use `/youtube-get-caption` separately to obtain a transcript file, then pass the file path to this skill.
+This skill takes a transcript file path (or inline text) and produces a consistent, structured summary. It is fully independent — no dependency on sibling skills. Use `/mk-youtube-get-caption` separately to obtain a transcript file, then pass the file path to this skill.
 
 ## File Structure
 
 ```
-transcript-summarize/
+mk-youtube-transcript-summarize/
 ├── SKILL.md              # Skill definition with summary prompt template
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)
@@ -72,9 +72,9 @@ transcript-summarize/
 
 # Typical workflow in Claude Code
 # Step 1: Download transcript
-/youtube-get-caption https://www.youtube.com/watch?v=xxx
+/mk-youtube-get-caption https://www.youtube.com/watch?v=xxx
 # Step 2: Summarize from the downloaded file
-/transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
+/mk-youtube-transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
 ```
 
 ## How It Works
@@ -82,7 +82,7 @@ transcript-summarize/
 ```
 Mode A: File Path
 
-  /transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
+  /mk-youtube-transcript-summarize /tmp/youtube-captions/VIDEO_ID.en.txt
            │
            ▼
   ┌───────────────────┐
@@ -174,7 +174,7 @@ Main Conversation              Subagent 1     Subagent 2     Subagent 3
 | Error | Cause | Solution |
 |-------|-------|----------|
 | `Usage: summary.sh <transcript_file_path>` | No argument provided | Pass a transcript file path |
-| `File not found: <path>` | File does not exist | Check the file path; run `/youtube-get-caption` first |
+| `File not found: <path>` | File does not exist | Check the file path; run `/mk-youtube-get-caption` first |
 
 ## License
 

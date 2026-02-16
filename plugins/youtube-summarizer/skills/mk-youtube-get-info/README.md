@@ -9,7 +9,7 @@ This skill extracts metadata from a YouTube video URL using `yt-dlp` and formats
 ## File Structure
 
 ```
-youtube-get-info/
+mk-youtube-get-info/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)

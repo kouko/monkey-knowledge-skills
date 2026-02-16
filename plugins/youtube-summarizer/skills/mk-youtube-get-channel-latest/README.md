@@ -14,7 +14,7 @@ When given a video URL, it automatically extracts the channel and fetches the la
 ## File Structure
 
 ```
-youtube-get-channel-latest/
+mk-youtube-get-channel-latest/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)

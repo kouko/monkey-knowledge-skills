@@ -9,7 +9,7 @@ This skill uses `yt-dlp` to search YouTube and returns video metadata in JSON fo
 ## File Structure
 
 ```
-youtube-search/
+mk-youtube-search/
 ├── SKILL.md              # Skill definition for Claude Code
 ├── README.md             # This file
 ├── bin/                  # Auto-downloaded binaries (initially empty)
