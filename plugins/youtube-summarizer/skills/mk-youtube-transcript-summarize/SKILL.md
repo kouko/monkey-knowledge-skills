@@ -25,8 +25,8 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 
 ## Examples
 
-- `/mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Video_Title.en.txt`
-- `/mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/transcribe/20091025__dQw4w9WgXcQ__Video_Title.txt`
+- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Video_Title.en.txt`
+- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/transcribe/20091025__dQw4w9WgXcQ__Video_Title.txt`
 
 **Typical workflow:**
 
@@ -34,8 +34,8 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 /mk-youtube-get-caption https://youtube.com/watch?v=xxx
 → outputs transcript file path
 
-/mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
-→ generates structured summary saved to $TMPDIR/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Title.en.md
+/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
+→ generates structured summary saved to /tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Title.en.md
 ```
 
 ## How it Works
@@ -44,7 +44,7 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 2. Parse JSON output to get `source_transcript`, `output_summary`, `char_count`, and `strategy`
 3. Follow the **Processing Strategy** indicated by `strategy` field
 4. Generate a structured summary following the **Summary Generation Rules**
-5. **Save to `$TMPDIR/monkey_knowledge/youtube/summaries/<basename>.md`** using Write tool
+5. **Save to `/tmp/monkey_knowledge/youtube/summaries/<basename>.md`** using Write tool
 6. **Display the FULL summary content** to the user exactly as written to the file — do NOT abbreviate, condense, or re-summarize
 7. Include file path in response footer
 
@@ -181,12 +181,12 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
 After generating the summary, save it using the Write tool:
 
-- **Output directory**: `$TMPDIR/monkey_knowledge/youtube/summaries/`
+- **Output directory**: `/tmp/monkey_knowledge/youtube/summaries/`
 - **Filename**: `<transcript_basename>.md` (preserves unified naming format)
 
 **Example:**
-- Input: `$TMPDIR/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.txt`
-- Output: `$TMPDIR/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
+- Input: `/tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.txt`
+- Output: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
 
 **CRITICAL — Full Display Rule**: After saving the summary file, you MUST display the COMPLETE summary content to the user in your response. Output the full markdown content exactly as written to the file. Do NOT:
 - Re-summarize or condense the summary
@@ -199,7 +199,7 @@ The user expects to see the full summary directly in the conversation without ne
 End your response with the file path:
 ```
 ---
-📄 Summary saved to: `$TMPDIR/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
+📄 Summary saved to: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
 ```
 
 ## Output Format
@@ -208,8 +208,8 @@ Script JSON output:
 ```json
 {
   "status": "success",
-  "source_transcript": "$TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
-  "output_summary": "$TMPDIR/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Video_Title.en.md",
+  "source_transcript": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Video_Title.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard",
@@ -220,11 +220,11 @@ Script JSON output:
 }
 ```
 
-The script automatically extracts video metadata from the centralized metadata store (`$TMPDIR/monkey_knowledge/youtube/meta/`) if available.
+The script automatically extracts video metadata from the centralized metadata store (`/tmp/monkey_knowledge/youtube/meta/`) if available.
 
 ## Notes
 
 - This skill does NOT download videos or subtitles — use `/mk-youtube-get-caption` first to obtain a transcript file
 - On first run, if jq is not installed, it will be auto-downloaded
 - For best results, combine with `/mk-youtube-get-info` to include the Video Info table in the summary
-- Summary is automatically saved to `$TMPDIR/monkey_knowledge/youtube/summaries/` directory
+- Summary is automatically saved to `/tmp/monkey_knowledge/youtube/summaries/` directory

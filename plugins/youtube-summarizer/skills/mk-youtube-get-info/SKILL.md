@@ -79,7 +79,7 @@ Get video details and generate content summary.
 
 ### Centralized Metadata Store
 
-This skill automatically saves video metadata to `$TMPDIR/monkey_knowledge/youtube/meta/{video_id}__{title}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary) to include video information in their outputs.
+This skill automatically saves video metadata to `/tmp/monkey_knowledge/youtube/meta/{video_id}__{title}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary) to include video information in their outputs.
 
 ### Content Summary
 (Generated from subtitle analysis)

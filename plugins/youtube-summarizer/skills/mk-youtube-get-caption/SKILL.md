@@ -54,8 +54,8 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.srt",
-  "text_file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.srt",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
   "language": "en",
   "subtitle_type": "manual",
   "char_count": 30287,

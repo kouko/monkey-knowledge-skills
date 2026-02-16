@@ -109,7 +109,7 @@ Get the latest content from a YouTube channel with type filtering.
 
 ## Centralized Metadata Store
 
-This skill automatically saves partial metadata for each video to `$TMPDIR/monkey_knowledge/youtube/meta/{video_id}__{title}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary).
+This skill automatically saves partial metadata for each video to `/tmp/monkey_knowledge/youtube/meta/{video_id}__{title}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary).
 
 Note: This is partial metadata (marked `partial: true`). Running `/mk-youtube-get-info` on a specific video will update it with complete metadata.
 

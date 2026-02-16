@@ -22,8 +22,8 @@ Claude Code plugin for YouTube video tools - search, info, transcript, audio dow
 - **Lightweight**: No pre-bundled binaries, downloads on first use
 - **Independent skills**: Each skill is self-contained with its own dependencies
 - **LLM-friendly output**: JSON output for easy parsing
-- **Centralized metadata storage**: Video metadata shared across all skills via `$TMPDIR/monkey_knowledge/youtube/meta/`
-- **Cross-platform temp paths**: Uses `$TMPDIR`, `$TEMP`, or `$TMP` for Windows compatibility
+- **Centralized metadata storage**: Video metadata shared across all skills via `/tmp/monkey_knowledge/youtube/meta/`
+- **Cross-platform temp paths**: Uses `/tmp` on macOS/Linux, `$TEMP`/`$TMP` on Windows
 - **Unified filename convention**: All files use `{YYYYMMDD}__{video_id}__{sanitized_title}.{ext}` format with date prefix for natural sorting
 
 ## Project Structure
@@ -104,16 +104,18 @@ All video metadata is stored in a portable temp directory for cross-skill access
 
 ### Portable Temp Path Resolution
 
-Temp directory is resolved in order of priority:
-1. `$TMPDIR` (macOS/Unix standard)
-2. `$TEMP` (Windows standard)
-3. `$TMP` (Windows fallback)
-4. `/tmp` (Unix default fallback)
+Temp directory is resolved by platform:
+
+| Platform | Path |
+|----------|------|
+| macOS | `/tmp/monkey_knowledge/` |
+| Linux | `/tmp/monkey_knowledge/` |
+| Windows (Git Bash) | `$TEMP/monkey_knowledge/` or `$TMP/monkey_knowledge/` |
 
 ### Directory Structure
 
 ```
-$TMPDIR/monkey_knowledge/        # or /tmp/monkey_knowledge/
+/tmp/monkey_knowledge/           # macOS/Linux
 ├── youtube/
 │   ├── meta/                    # Centralized metadata store
 │   │   └── {YYYYMMDD}__{video_id}__{title}.meta.json
@@ -144,7 +146,7 @@ $TMPDIR/monkey_knowledge/        # or /tmp/monkey_knowledge/
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                 Centralized Metadata Store                       │
-│           $TMPDIR/monkey_knowledge/youtube/meta/                 │
+│             /tmp/monkey_knowledge/youtube/meta/                  │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌──────────────┐                                                │
 │  │ get-info     │──▶ Writes complete metadata (partial: false)   │
@@ -249,8 +251,8 @@ All skills include video metadata in their JSON output when available.
 ```json
 {
   "status": "success",
-  "file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.srt",
-  "text_file_path": "$TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.srt",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt",
   "language": "en",
   "subtitle_type": "manual",
   "char_count": 30287,
@@ -269,7 +271,7 @@ All skills include video metadata in their JSON output when available.
 ```json
 {
   "status": "success",
-  "file_path": "$TMPDIR/monkey_knowledge/youtube/audio/20240101__VIDEO_ID__Video_Title.m4a",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20240101__VIDEO_ID__Video_Title.m4a",
   "file_size": "5.2M",
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",
@@ -284,8 +286,8 @@ All skills include video metadata in their JSON output when available.
 ```json
 {
   "status": "success",
-  "file_path": "$TMPDIR/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.json",
-  "text_file_path": "$TMPDIR/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.json",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.txt",
   "language": "en",
   "duration": "3:32",
   "model": "medium",
@@ -305,8 +307,8 @@ All skills include video metadata in their JSON output when available.
 ```json
 {
   "status": "success",
-  "source_transcript": "$TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt",
-  "output_summary": "$TMPDIR/monkey_knowledge/youtube/summaries/20240101__VIDEO_ID__Video_Title.en.md",
+  "source_transcript": "/tmp/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20240101__VIDEO_ID__Video_Title.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard",
@@ -333,7 +335,7 @@ All skills include video metadata in their JSON output when available.
 # Search for videos
 /mk-youtube-search "AI tutorial" 5
 
-# Get video info (saves metadata to $TMPDIR/monkey_knowledge/youtube/meta/)
+# Get video info (saves metadata to /tmp/monkey_knowledge/youtube/meta/)
 /mk-youtube-get-info https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 # Download subtitles (English)
@@ -353,7 +355,7 @@ All skills include video metadata in their JSON output when available.
 
 # Manual workflow: caption → summarize
 /mk-youtube-get-caption https://www.youtube.com/watch?v=xxx
-/mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt
+/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20240101__VIDEO_ID__Video_Title.en.txt
 ```
 
 ## Workflow: Video Summarization

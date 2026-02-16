@@ -28,7 +28,7 @@ Download video audio file (best available format, no conversion).
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
 | URL | Yes | - | YouTube video URL |
-| output_dir | No | $TMPDIR/monkey_knowledge/youtube/audio | Output directory for audio file |
+| output_dir | No | /tmp/monkey_knowledge/youtube/audio | Output directory for audio file |
 | browser | No | auto | Browser for cookies (chrome, firefox, safari, edge, brave) |
 
 ## Examples
@@ -75,7 +75,7 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "$TMPDIR/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
   "file_size": "5.2M",
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",

@@ -46,8 +46,8 @@ mk-youtube-transcript-summarize/
 ```json
 {
   "status": "success",
-  "source_transcript": "$TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt",
-  "output_summary": "$TMPDIR/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Title.en.md",
+  "source_transcript": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Title.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard",
@@ -77,24 +77,24 @@ mk-youtube-transcript-summarize/
 
 ```bash
 # Validate a transcript file
-./scripts/summary.sh "$TMPDIR/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Video_Title.en.txt"
+./scripts/summary.sh "/tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Video_Title.en.txt"
 
 # Typical workflow in Claude Code
 # Step 1: Download transcript
 /mk-youtube-get-caption https://www.youtube.com/watch?v=xxx
 # Step 2: Summarize from the downloaded file
-/mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
+/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
 ```
 
 ## How It Works
 
 ```
-  /mk-youtube-transcript-summarize $TMPDIR/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
+  /mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
            │
            ▼
   ┌───────────────────┐
   │    summary.sh     │  ← Validate file + determine strategy
-  │  (file_path arg)  │     + read metadata from $TMPDIR/monkey_knowledge/youtube/meta/
+  │  (file_path arg)  │     + read metadata from /tmp/monkey_knowledge/youtube/meta/
   └────────┬──────────┘
            │
            ▼
@@ -117,7 +117,7 @@ mk-youtube-transcript-summarize/
            ▼
   ┌───────────────────┐
   │  Structured       │  ← Following SKILL.md prompt rules
-  │  Summary Output   │     Save to $TMPDIR/monkey_knowledge/youtube/summaries/
+  │  Summary Output   │     Save to /tmp/monkey_knowledge/youtube/summaries/
   └───────────────────┘
 ```
 
