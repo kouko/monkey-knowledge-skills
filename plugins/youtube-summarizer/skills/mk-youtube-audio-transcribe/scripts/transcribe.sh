@@ -107,8 +107,24 @@ if [ $MODEL_EXIT_CODE -eq 2 ]; then
         message: .message,
         model: .model,
         model_size: .model_size,
+        download_url: .download_url,
         download_command: .download_command,
-        hint: "Run the download_command in terminal to download the model with progress bar"
+        hint: "Execute download_command using Bash tool with timeout: 900000 (15 minutes)"
+    }'
+    exit 1
+elif [ $MODEL_EXIT_CODE -eq 3 ]; then
+    # Model corrupted - output structured error with re-download info
+    echo "$MODEL_ERROR_JSON" | "$JQ" '{
+        status: "error",
+        error_code: .error_code,
+        message: .message,
+        model: .model,
+        model_size: .model_size,
+        expected_sha256: .expected_sha256,
+        actual_sha256: .actual_sha256,
+        model_path: .model_path,
+        download_command: .download_command,
+        hint: "Execute download_command using Bash tool with timeout: 900000 (15 minutes)"
     }'
     exit 1
 elif [ $MODEL_EXIT_CODE -ne 0 ]; then

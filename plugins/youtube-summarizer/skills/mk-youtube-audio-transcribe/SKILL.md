@@ -136,18 +136,24 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 
 When you receive `UNKNOWN_MODEL` error: suggest a valid model from the `available_models` list.
 
-**Error (download failed):**
+**Error (model not found):**
 ```json
 {
   "status": "error",
-  "error_code": "DOWNLOAD_FAILED",
-  "message": "Failed to download model 'medium'",
+  "error_code": "MODEL_NOT_FOUND",
+  "message": "Model 'medium' not found. Please download it first.",
   "model": "medium",
-  "download_url": "https://huggingface.co/..."
+  "model_size": "1.4GB",
+  "download_url": "https://huggingface.co/...",
+  "download_command": "curl -L --progress-bar -o '/path/to/models/ggml-medium.bin' 'https://...' 2>&1"
 }
 ```
 
-When you receive `DOWNLOAD_FAILED` error: suggest checking network connection and retrying, or running `./scripts/download-model.sh <model>` in terminal.
+When you receive `MODEL_NOT_FOUND` error:
+1. Ask user: "Model 'medium' (1.4GB) is required for transcription. Download now?"
+2. If user agrees: execute `download_command` using Bash tool with `timeout: 900000` (15 minutes)
+3. After download completes: re-run the original transcribe command
+4. If user declines: show the command in a code block for manual execution
 
 **Error (model corrupted):**
 ```json
@@ -166,7 +172,7 @@ When you receive `DOWNLOAD_FAILED` error: suggest checking network connection an
 
 When you receive `MODEL_CORRUPTED` error:
 1. Ask user: "Model 'medium' is corrupted or incomplete. Re-download now?"
-2. If user agrees: execute `download_command` (removes corrupted file and re-downloads) using Bash tool with `timeout: 600000`
+2. If user agrees: execute `download_command` (removes corrupted file and re-downloads) using Bash tool with `timeout: 900000` (15 minutes)
 3. If user declines: show the command in a code block for manual execution
 
 ## Output Fields
@@ -252,7 +258,7 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 - **Force refresh**: Use `--force` flag to re-transcribe even if cached file exists
 - **Specify language for best results** - enables auto-selection of specialized models (zh→belle-zh, ja→kotoba-ja)
 - Use Read tool to get file content from `file_path` or `text_file_path`
-- **Models auto-download on first use** - progress shown in stderr
+- **Models must be downloaded before first use** - returns `MODEL_NOT_FOUND` error with download command
 - Uses Metal acceleration on macOS for faster processing
 - Supports auto language detection
 - Audio is converted to 16kHz WAV for optimal results
@@ -260,7 +266,7 @@ Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 ## Model Download
 
-Models are **auto-downloaded** on first use. For manual download (to see progress bar):
+Models must be downloaded before transcription. When you receive a `MODEL_NOT_FOUND` error, execute the `download_command` with `timeout: 900000`.
 
 ```bash
 # In terminal (to see progress bar)
