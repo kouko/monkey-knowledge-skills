@@ -34,10 +34,15 @@ else
     STRATEGY="chunked"
 fi
 
+# Calculate output summary path
+BASENAME=$(basename "$ABS_PATH")
+OUTPUT_SUMMARY="/tmp/youtube-summaries/${BASENAME%.*}.md"
+
 "$JQ" -n \
     --arg status "success" \
-    --arg file_path "$ABS_PATH" \
+    --arg source_transcript "$ABS_PATH" \
+    --arg output_summary "$OUTPUT_SUMMARY" \
     --argjson char_count "$CHAR_COUNT" \
     --argjson line_count "$LINE_COUNT" \
     --arg strategy "$STRATEGY" \
-    '{status: $status, file_path: $file_path, char_count: $char_count, line_count: $line_count, strategy: $strategy}'
+    '{status: $status, source_transcript: $source_transcript, output_summary: $output_summary, char_count: $char_count, line_count: $line_count, strategy: $strategy}'

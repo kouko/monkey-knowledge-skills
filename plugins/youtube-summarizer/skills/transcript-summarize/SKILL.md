@@ -1,6 +1,6 @@
 ---
 name: transcript-summarize
-description: Summarize YouTube video content with structured output. Use when user wants a detailed summary from a transcript file path or inline transcript text.
+description: Summarize YouTube video content with structured output. Use when user wants a detailed summary from a transcript file path.
 license: MIT
 metadata:
   version: 2.0.0
@@ -21,13 +21,12 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 
 ```
 /transcript-summarize <transcript_file_path>
-/transcript-summarize (then paste transcript text in conversation)
 ```
 
 ## Examples
 
-- `/transcript-summarize /tmp/youtube-captions/dQw4w9WgXcQ.en.txt` - Summarize from a transcript file
-- `/transcript-summarize` followed by pasting transcript text - Summarize inline text
+- `/transcript-summarize /tmp/youtube-captions/dQw4w9WgXcQ.en.txt`
+- `/transcript-summarize /tmp/youtube-audio-transcribe/video.txt`
 
 **Typical workflow:**
 
@@ -41,19 +40,14 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 
 ## How it Works
 
-### Mode A: File Path
-
 1. Execute: `{baseDir}/scripts/summary.sh "<transcript_file_path>"`
-2. Parse JSON output to get validated `file_path`, `char_count`, and `strategy`
-3. **Follow the processing strategy** indicated by `strategy` field (see **Processing Strategy** below)
-4. Generate a structured summary following the **Summary Generation Rules** below
+2. Parse JSON output to get `source_transcript`, `output_summary`, `char_count`, and `strategy`
+3. Follow the **Processing Strategy** indicated by `strategy` field
+4. Generate a structured summary following the **Summary Generation Rules**
+5. **Save to `/tmp/youtube-summaries/<basename>.md`** using Write tool
+6. Include file path in response footer
 
-### Mode B: Inline Text
-
-1. The user provides transcript text directly in the conversation (no script execution needed)
-2. Generate a structured summary following the **Summary Generation Rules** below
-
-### Processing Strategy (Mode A)
+### Processing Strategy
 
 The `strategy` field from `summary.sh` determines how to handle the transcript:
 
@@ -102,7 +96,6 @@ Use parallel subagents to process chunks independently, keeping the main convers
 #### Fallback Rules
 
 - **Missing or unknown strategy**: If the `strategy` field is missing, empty, or contains an unrecognized value, default to the `standard` strategy
-- **Mode B overflow detection**: If inline transcript text (Mode B) appears exceptionally long (estimated > 80,000 chars), advise the user to save the text to a file and use Mode A instead, so that `summary.sh` can determine the correct processing strategy
 - **Chunked subagent retry**: If a subagent in `chunked` mode returns an empty result or clearly irrelevant content (e.g., error messages instead of summary bullets), retry that specific chunk once before proceeding with synthesis
 
 ## Summary Generation Rules
@@ -172,8 +165,6 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
    | `sectioned` | 8-12% | Medium-long content, balanced density |
    | `chunked` | 7-12% | Very long content, high-level synthesis |
 
-   For Mode B (inline text), use the `standard` ratio as default
-
 5. **Tone**: Maintain an informative, neutral tone
    - Present the speaker's arguments faithfully
    - Do not add opinions or editorial commentary
@@ -183,13 +174,31 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
    - These should be standalone — understandable without reading the full summary
    - Prioritize actionable insights and surprising findings
 
+## Save Summary to File
+
+After generating the summary, save it using the Write tool:
+
+- **Output directory**: `/tmp/youtube-summaries/`
+- **Filename**: `<transcript_basename>.md`
+
+**Example:**
+- Input: `/tmp/youtube-captions/dQw4w9WgXcQ.en.txt`
+- Output: `/tmp/youtube-summaries/dQw4w9WgXcQ.en.md`
+
+End your response with the file path:
+```
+---
+📄 Summary saved to: `/tmp/youtube-summaries/dQw4w9WgXcQ.en.md`
+```
+
 ## Output Format
 
-Script JSON output (Mode A only):
+Script JSON output:
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "source_transcript": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "output_summary": "/tmp/youtube-summaries/VIDEO_ID.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard"
@@ -201,3 +210,4 @@ Script JSON output (Mode A only):
 - This skill does NOT download videos or subtitles — use `/youtube-get-caption` first to obtain a transcript file
 - On first run, if jq is not installed, it will be auto-downloaded
 - For best results, combine with `/youtube-get-info` to include the Video Info table in the summary
+- Summary is automatically saved to `/tmp/youtube-summaries/` directory

@@ -45,7 +45,8 @@ transcript-summarize/
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "source_transcript": "/tmp/youtube-captions/VIDEO_ID.en.txt",
+  "output_summary": "/tmp/youtube-summaries/VIDEO_ID.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard"
@@ -57,7 +58,8 @@ transcript-summarize/
 | Field | Type | Description |
 |-------|------|-------------|
 | status | string | `success` or `error` |
-| file_path | string | Absolute path to the transcript file |
+| source_transcript | string | Absolute path to the input transcript file |
+| output_summary | string | Expected output path for the generated summary |
 | char_count | number | Character count of the file |
 | line_count | number | Line count of the file |
 | strategy | string | Processing strategy: `standard`, `sectioned`, or `chunked` |
@@ -90,7 +92,7 @@ Mode A: File Path
            │
            ▼
   ┌───────────────────┐
-  │  JSON response    │  ← {status, file_path, char_count, line_count, strategy}
+  │  JSON response    │  ← {status, source_transcript, output_summary, ...}
   └────────┬──────────┘
            │
            ▼
