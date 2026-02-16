@@ -133,7 +133,7 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
 ## Key Takeaways
 
-- 3-5 most important conclusions or insights from the video
+- 5-8 most important conclusions or insights from the video
 ```
 
 ### Video Info Table
@@ -145,8 +145,9 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
 1. **Section structure**: Divide the summary into logical sections using H4 (`####`) headings
    - If the video description contains chapter timestamps, use those as the section skeleton
-   - Otherwise, identify 3-8 logical topic shifts in the transcript
-   - Each section should have 2-5 bullet points
+   - Otherwise, identify 5-10 logical topic shifts in the transcript
+   - Each section should have 3-7 bullet points
+   - Prefer more sections with focused content over fewer sections with broad content
 
 2. **Data preservation**: Always preserve and highlight specific data points
    - Percentages, dollar amounts, dates, statistics → **bold**
@@ -162,16 +163,16 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
    | Strategy | Compression | Guideline |
    |----------|-------------|-----------|
-   | `standard` | 10-15% | Short content, detailed coverage |
-   | `sectioned` | 8-12% | Medium-long content, balanced density |
-   | `chunked` | 7-12% | Very long content, high-level synthesis |
+   | `standard` | 20-30% | Short content, detailed coverage |
+   | `sectioned` | 15-20% | Medium-long content, balanced density |
+   | `chunked` | 10-15% | Very long content, high-level synthesis |
 
 5. **Tone**: Maintain an informative, neutral tone
    - Present the speaker's arguments faithfully
    - Do not add opinions or editorial commentary
    - Use active voice
 
-6. **Key Takeaways**: End with 3-5 bullet points summarizing the most important insights
+6. **Key Takeaways**: End with 5-8 bullet points summarizing the most important insights
    - These should be standalone — understandable without reading the full summary
    - Prioritize actionable insights and surprising findings
 
