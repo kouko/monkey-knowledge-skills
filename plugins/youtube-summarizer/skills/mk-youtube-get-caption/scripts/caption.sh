@@ -29,17 +29,108 @@ fi
 
 mkdir -p "$OUTPUT_DIR"
 
-# Get video ID, title, and upload_date for unified naming
-VIDEO_ID=$("$YT_DLP" --print id "$URL" 2>/dev/null)
-TITLE=$("$YT_DLP" --print title "$URL" 2>/dev/null)
-UPLOAD_DATE=$("$YT_DLP" --print upload_date "$URL" 2>/dev/null)
+# Browser argument (optional, can be specified after lang)
+BROWSER="${3:-}"
+
+# Get Chrome profiles directory based on OS
+get_chrome_dir() {
+    case "$(uname)" in
+        Darwin) echo "$HOME/Library/Application Support/Google/Chrome" ;;
+        Linux)  echo "$HOME/.config/google-chrome" ;;
+        *)      echo "" ;;  # Windows needs different handling
+    esac
+}
+
+# Try browser cookies and return the working browser string
+try_browser_cookies() {
+    local browser="$1"
+
+    # For Chrome without specific profile, try all profiles
+    if [[ "$browser" == "chrome" ]]; then
+        local chrome_dir
+        chrome_dir=$(get_chrome_dir)
+        if [ -d "$chrome_dir" ]; then
+            # Try Default profile first
+            if "$YT_DLP" --cookies-from-browser "chrome:Default" --simulate "$URL" >/dev/null 2>&1; then
+                echo "chrome:Default"
+                return 0
+            fi
+            # Try other profiles
+            for profile_dir in "$chrome_dir"/Profile*/; do
+                if [ -d "$profile_dir" ]; then
+                    local profile_name
+                    profile_name=$(basename "$profile_dir")
+                    if "$YT_DLP" --cookies-from-browser "chrome:$profile_name" --simulate "$URL" >/dev/null 2>&1; then
+                        echo "chrome:$profile_name"
+                        return 0
+                    fi
+                fi
+            done
+        fi
+    fi
+
+    # Non-Chrome or all Chrome profiles failed
+    if "$YT_DLP" --cookies-from-browser "$browser" --simulate "$URL" >/dev/null 2>&1; then
+        echo "$browser"
+        return 0
+    fi
+    return 1
+}
+
+# Fetch metadata with optional cookie authentication
+fetch_metadata() {
+    local use_cookies="$1"
+    local field="$2"
+    local cookie_args=()
+
+    if [ "$use_cookies" = "true" ] && [ -n "$BROWSER" ]; then
+        cookie_args=(--cookies-from-browser "$BROWSER")
+    elif [ "$use_cookies" = "true" ]; then
+        for browser in chrome firefox safari edge brave; do
+            local found_browser
+            if found_browser=$(try_browser_cookies "$browser"); then
+                cookie_args=(--cookies-from-browser "$found_browser")
+                break
+            fi
+        done
+    fi
+
+    "$YT_DLP" --print "$field" "${cookie_args[@]}" "$URL" 2>/dev/null
+}
+
+# Pre-check: determine if we should use cookies first based on existing metadata
+USE_COOKIES_FIRST="false"
+VIDEO_ID_FROM_URL=$(extract_video_id_from_url "$URL")
+if [ -n "$VIDEO_ID_FROM_URL" ] && check_needs_auth "$VIDEO_ID_FROM_URL"; then
+    echo "[INFO] Known restricted video, using cookies directly..." >&2
+    USE_COOKIES_FIRST="true"
+fi
+
+# Get video ID, title, and upload_date for unified naming (with fallback)
+if [ "$USE_COOKIES_FIRST" = "true" ]; then
+    VIDEO_ID=$(fetch_metadata "true" "id") || VIDEO_ID=""
+    NEED_COOKIES="true"
+else
+    VIDEO_ID=$(fetch_metadata "false" "id") || VIDEO_ID=""
+    if [ -z "$VIDEO_ID" ]; then
+        echo "[INFO] First metadata attempt failed, retrying with browser cookies..." >&2
+        VIDEO_ID=$(fetch_metadata "true" "id") || VIDEO_ID=""
+        NEED_COOKIES="true"
+    else
+        NEED_COOKIES="false"
+    fi
+fi
 
 if [ -z "$VIDEO_ID" ]; then
     "$JQ" -n --arg status "error" \
-        --arg message "Could not extract video ID from URL" \
+        --arg message "Could not extract video ID (tried with and without cookies)" \
         '{status: $status, message: $message}'
     exit 1
 fi
+
+# Get remaining metadata using the determined cookie strategy
+TITLE=$(fetch_metadata "$NEED_COOKIES" "title") || TITLE=""
+UPLOAD_DATE=$(fetch_metadata "$NEED_COOKIES" "upload_date") || UPLOAD_DATE=""
 
 BASENAME=$(make_basename "$UPLOAD_DATE" "$VIDEO_ID")
 
@@ -47,9 +138,9 @@ BASENAME=$(make_basename "$UPLOAD_DATE" "$VIDEO_ID")
 EXISTING_META=$(read_meta "$VIDEO_ID")
 if [ -z "$EXISTING_META" ]; then
     # Fetch minimal metadata for centralized store
-    CHANNEL=$("$YT_DLP" --print channel "$URL" 2>/dev/null || echo "")
-    DURATION=$("$YT_DLP" --print duration_string "$URL" 2>/dev/null || echo "")
-    WEBPAGE_URL=$("$YT_DLP" --print webpage_url "$URL" 2>/dev/null || echo "$URL")
+    CHANNEL=$(fetch_metadata "$NEED_COOKIES" "channel") || CHANNEL=""
+    DURATION=$(fetch_metadata "$NEED_COOKIES" "duration_string") || DURATION=""
+    WEBPAGE_URL=$(fetch_metadata "$NEED_COOKIES" "webpage_url") || WEBPAGE_URL="$URL"
 
     META_JSON=$("$JQ" -n \
         --arg video_id "$VIDEO_ID" \
@@ -78,7 +169,7 @@ fi
 # Determine target language for cache check
 CACHE_LANG="$LANG"
 if [ -z "$CACHE_LANG" ] || [ "$CACHE_LANG" = "auto" ]; then
-    CACHE_LANG=$("$YT_DLP" --print "%(language)s" "$URL" 2>/dev/null || echo "")
+    CACHE_LANG=$(fetch_metadata "$NEED_COOKIES" "language") || CACHE_LANG=""
     if [ -z "$CACHE_LANG" ] || [ "$CACHE_LANG" = "NA" ] || [ "$CACHE_LANG" = "null" ]; then
         CACHE_LANG=""  # Will check for any language
     fi
@@ -161,32 +252,59 @@ fi
 
 # If no language specified, get video's original language
 if [ -z "$LANG" ] || [ "$LANG" = "auto" ]; then
-    LANG=$("$YT_DLP" --print "%(language)s" "$URL" 2>/dev/null || echo "")
+    LANG=$(fetch_metadata "$NEED_COOKIES" "language") || LANG=""
     # If detection failed, use default priority
     if [ -z "$LANG" ] || [ "$LANG" = "NA" ] || [ "$LANG" = "null" ]; then
         LANG="en,ja,zh-TW,zh-Hant"
     fi
 fi
 
+# Download subtitles with optional cookie authentication
+download_subtitles() {
+    local sub_type="$1"  # "manual" or "auto"
+    local cookie_args=()
+
+    if [ "$NEED_COOKIES" = "true" ] && [ -n "$BROWSER" ]; then
+        cookie_args=(--cookies-from-browser "$BROWSER")
+    elif [ "$NEED_COOKIES" = "true" ]; then
+        for browser in chrome firefox safari edge brave; do
+            local found_browser
+            if found_browser=$(try_browser_cookies "$browser"); then
+                cookie_args=(--cookies-from-browser "$found_browser")
+                echo "[INFO] Using cookies from: $found_browser" >&2
+                break
+            fi
+        done
+    fi
+
+    if [ "$sub_type" = "auto" ]; then
+        "$YT_DLP" --write-auto-subs \
+                  --sub-lang "$LANG" \
+                  --skip-download --convert-subs srt \
+                  "${cookie_args[@]}" \
+                  -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
+    else
+        "$YT_DLP" --write-subs \
+                  --sub-lang "$LANG" \
+                  --skip-download --convert-subs srt \
+                  "${cookie_args[@]}" \
+                  -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
+    fi
+}
+
 # First try to download manual (author-uploaded) subtitles
 # Download to temp location first, then rename
 TEMP_DIR=$(mktemp -d)
 cleanup() { rm -rf "$TEMP_DIR"; }
 trap cleanup EXIT
-"$YT_DLP" --write-subs \
-          --sub-lang "$LANG" \
-          --skip-download --convert-subs srt \
-          -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
+download_subtitles "manual"
 
 TEMP_SRT=$(ls -t "$TEMP_DIR"/*.srt 2>/dev/null | head -1)
 SUBTITLE_TYPE="manual"
 
 # If no manual subtitles found, try auto-generated
 if [ -z "$TEMP_SRT" ] || [ ! -f "$TEMP_SRT" ]; then
-    "$YT_DLP" --write-auto-subs \
-              --sub-lang "$LANG" \
-              --skip-download --convert-subs srt \
-              -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
+    download_subtitles "auto"
 
     TEMP_SRT=$(ls -t "$TEMP_DIR"/*.srt 2>/dev/null | head -1)
     SUBTITLE_TYPE="auto-generated"

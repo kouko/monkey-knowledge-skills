@@ -81,18 +81,30 @@ fetch_info() {
     "$YT_DLP" -j --no-download "${cookie_args[@]}" "$URL" 2>/dev/null
 }
 
-# First attempt: without authentication
-RAW_META=$(fetch_info "false") || RAW_META=""
+# Pre-check: determine if we should use cookies first based on existing metadata
+USE_COOKIES_FIRST="false"
+VIDEO_ID_FROM_URL=$(extract_video_id_from_url "$URL")
+if [ -n "$VIDEO_ID_FROM_URL" ] && check_needs_auth "$VIDEO_ID_FROM_URL"; then
+    echo "[INFO] Known restricted video, using cookies directly..." >&2
+    USE_COOKIES_FIRST="true"
+fi
+
+# Fetch info based on pre-check result
+if [ "$USE_COOKIES_FIRST" = "true" ]; then
+    RAW_META=$(fetch_info "true") || RAW_META=""
+else
+    # First attempt: without authentication
+    RAW_META=$(fetch_info "false") || RAW_META=""
+    if [ -z "$RAW_META" ]; then
+        echo "[INFO] First attempt failed, retrying with browser cookies..." >&2
+        # Second attempt: with browser cookies
+        RAW_META=$(fetch_info "true") || RAW_META=""
+    fi
+fi
 
 if [ -z "$RAW_META" ]; then
-    echo "[INFO] First attempt failed, retrying with browser cookies..." >&2
-    # Second attempt: with browser cookies
-    RAW_META=$(fetch_info "true") || RAW_META=""
-
-    if [ -z "$RAW_META" ]; then
-        "$JQ" -n '{status: "error", message: "Failed to fetch video info (tried with and without cookies)"}'
-        exit 1
-    fi
+    "$JQ" -n '{status: "error", message: "Failed to fetch video info (tried with and without cookies)"}'
+    exit 1
 fi
 
 # Extract video ID, title, and upload_date for basename

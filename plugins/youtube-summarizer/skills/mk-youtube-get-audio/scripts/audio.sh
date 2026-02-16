@@ -94,11 +94,27 @@ fetch_metadata() {
     "$YT_DLP" --print "$field" "${cookie_args[@]}" "$URL" 2>/dev/null
 }
 
+# Pre-check: determine if we should use cookies first based on existing metadata
+USE_COOKIES_FIRST="false"
+VIDEO_ID_FROM_URL=$(extract_video_id_from_url "$URL")
+if [ -n "$VIDEO_ID_FROM_URL" ] && check_needs_auth "$VIDEO_ID_FROM_URL"; then
+    echo "[INFO] Known restricted video, using cookies directly..." >&2
+    USE_COOKIES_FIRST="true"
+fi
+
 # Get video ID, title, and upload_date for unified naming (with fallback)
-VIDEO_ID=$(fetch_metadata "false" "id") || VIDEO_ID=""
-if [ -z "$VIDEO_ID" ]; then
-    echo "[INFO] First metadata attempt failed, retrying with browser cookies..." >&2
+if [ "$USE_COOKIES_FIRST" = "true" ]; then
     VIDEO_ID=$(fetch_metadata "true" "id") || VIDEO_ID=""
+    NEED_COOKIES="true"
+else
+    VIDEO_ID=$(fetch_metadata "false" "id") || VIDEO_ID=""
+    if [ -z "$VIDEO_ID" ]; then
+        echo "[INFO] First metadata attempt failed, retrying with browser cookies..." >&2
+        VIDEO_ID=$(fetch_metadata "true" "id") || VIDEO_ID=""
+        NEED_COOKIES="true"
+    else
+        NEED_COOKIES="false"
+    fi
 fi
 
 if [ -z "$VIDEO_ID" ]; then
@@ -106,10 +122,9 @@ if [ -z "$VIDEO_ID" ]; then
     exit 1
 fi
 
-# Determine if cookies are needed for remaining metadata
-NEED_COOKIES="false"
-TITLE=$(fetch_metadata "false" "title") || TITLE=""
-if [ -z "$TITLE" ]; then
+# Get remaining metadata using the determined cookie strategy
+TITLE=$(fetch_metadata "$NEED_COOKIES" "title") || TITLE=""
+if [ -z "$TITLE" ] && [ "$NEED_COOKIES" = "false" ]; then
     NEED_COOKIES="true"
     TITLE=$(fetch_metadata "true" "title") || TITLE=""
 fi

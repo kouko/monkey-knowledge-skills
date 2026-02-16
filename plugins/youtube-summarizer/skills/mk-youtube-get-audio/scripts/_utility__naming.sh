@@ -106,3 +106,54 @@ find_file_by_id() {
     # 格式: YYYYMMDD__VIDEO_ID.EXT
     find "$dir" -maxdepth 1 -name "*__${video_id}${pattern}" 2>/dev/null | head -1
 }
+
+# 從 YouTube URL 提取 video_id
+# 支援格式: watch?v=, youtu.be/, shorts/, embed/, v/
+# 用法: extract_video_id_from_url "$URL"
+# 輸出: video_id 或 空字串
+extract_video_id_from_url() {
+    local url="$1"
+    local video_id=""
+
+    # youtu.be/VIDEO_ID
+    if [[ "$url" =~ youtu\.be/([a-zA-Z0-9_-]{11}) ]]; then
+        video_id="${BASH_REMATCH[1]}"
+    # youtube.com/watch?v=VIDEO_ID
+    elif [[ "$url" =~ [?&]v=([a-zA-Z0-9_-]{11}) ]]; then
+        video_id="${BASH_REMATCH[1]}"
+    # youtube.com/shorts/VIDEO_ID or /embed/VIDEO_ID or /v/VIDEO_ID
+    elif [[ "$url" =~ /(shorts|embed|v)/([a-zA-Z0-9_-]{11}) ]]; then
+        video_id="${BASH_REMATCH[2]}"
+    fi
+
+    echo "$video_id"
+}
+
+# 檢查影片是否需要認證（基於既有 metadata）
+# 用法: check_needs_auth "$VIDEO_ID"
+# 返回: 0 = 需要認證, 1 = 不需要或未知
+check_needs_auth() {
+    local video_id="$1"
+
+    if [ -z "$video_id" ]; then
+        return 1
+    fi
+
+    local meta
+    meta=$(read_meta "$video_id")
+    if [ -z "$meta" ]; then
+        return 1  # 無 metadata，狀態未知
+    fi
+
+    local availability
+    availability=$(echo "$meta" | "$JQ" -r '.availability // "unknown"')
+
+    case "$availability" in
+        members_only|subscriber_only|needs_auth|premium_only|private)
+            return 0  # 需要認證
+            ;;
+        *)
+            return 1  # 不需要或未知
+            ;;
+    esac
+}
