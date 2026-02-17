@@ -213,10 +213,10 @@ fi
 # --- Force refresh: delete existing files ---
 if [ "$FORCE_REFRESH" = "true" ]; then
     echo "[INFO] Force refresh enabled, removing existing files..." >&2
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.m4a "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.webm 2>/dev/null || true
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.opus "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.ogg 2>/dev/null || true
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.mp3 "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.aac 2>/dev/null || true
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.wav 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.m4a "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.webm 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.opus "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.ogg 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.mp3 "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.aac 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.wav 2>/dev/null || true
 fi
 
 # Create temp directory for download

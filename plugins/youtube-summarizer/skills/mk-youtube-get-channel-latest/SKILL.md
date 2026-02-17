@@ -23,7 +23,7 @@ Get the latest content from a YouTube channel with type filtering.
 ## Quick Start
 
 ```
-/youtube-get-channel-latest <channel> [limit] [type]
+/mk-youtube-get-channel-latest <channel> [limit] [type]
 ```
 
 ## Parameters
@@ -46,13 +46,13 @@ Get the latest content from a YouTube channel with type filtering.
 
 ## Examples
 
-- `/youtube-get-channel-latest @GoogleDevelopers` - Latest 10 items from channel
-- `/youtube-get-channel-latest @MKBHD 5 videos` - Latest 5 regular videos
-- `/youtube-get-channel-latest @NASA 10 live` - Latest 10 livestreams
-- `/youtube-get-channel-latest @shorts 20 shorts` - Latest 20 shorts
-- `/youtube-get-channel-latest https://www.youtube.com/@TED 3 podcasts` - Latest 3 podcast episodes
-- `/youtube-get-channel-latest https://www.youtube.com/watch?v=xxx 5` - Get latest from video's channel
-- `/youtube-get-channel-latest https://youtu.be/xxx 5 shorts` - Get shorts from video's channel
+- `/mk-youtube-get-channel-latest @GoogleDevelopers` - Latest 10 items from channel
+- `/mk-youtube-get-channel-latest @MKBHD 5 videos` - Latest 5 regular videos
+- `/mk-youtube-get-channel-latest @NASA 10 live` - Latest 10 livestreams
+- `/mk-youtube-get-channel-latest @shorts 20 shorts` - Latest 20 shorts
+- `/mk-youtube-get-channel-latest https://www.youtube.com/@TED 3 podcasts` - Latest 3 podcast episodes
+- `/mk-youtube-get-channel-latest https://www.youtube.com/watch?v=xxx 5` - Get latest from video's channel
+- `/mk-youtube-get-channel-latest https://youtu.be/xxx 5 shorts` - Get shorts from video's channel
 
 ## How it Works
 
@@ -109,7 +109,7 @@ Get the latest content from a YouTube channel with type filtering.
 
 ## Centralized Metadata Store
 
-This skill automatically saves partial metadata for each video to `/tmp/monkey_knowledge/youtube/meta/{video_id}__{title}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary).
+This skill automatically saves partial metadata for each video to `/tmp/monkey_knowledge/youtube/meta/{YYYYMMDD}__{video_id}.meta.json`. This metadata can be accessed by downstream skills (caption, audio, transcribe, summary).
 
 Note: This is partial metadata (marked `partial: true`). Running `/mk-youtube-get-info` on a specific video will update it with complete metadata.
 

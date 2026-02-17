@@ -20,7 +20,7 @@ Download video audio file (best available format, no conversion).
 ## Quick Start
 
 ```
-/youtube-get-audio <URL> [output_dir] [browser] [--force]
+/mk-youtube-get-audio <URL> [output_dir] [browser] [--force]
 ```
 
 ## Parameters
@@ -34,9 +34,9 @@ Download video audio file (best available format, no conversion).
 
 ## Examples
 
-- `/youtube-get-audio https://youtube.com/watch?v=xxx` - Download with auto cookie fallback
-- `/youtube-get-audio https://youtube.com/watch?v=xxx ~/Music` - Save to custom directory
-- `/youtube-get-audio https://youtube.com/watch?v=xxx /tmp chrome` - Use Chrome cookies
+- `/mk-youtube-get-audio https://youtube.com/watch?v=xxx` - Download with auto cookie fallback
+- `/mk-youtube-get-audio https://youtube.com/watch?v=xxx ~/Music` - Save to custom directory
+- `/mk-youtube-get-audio https://youtube.com/watch?v=xxx /tmp chrome` - Use Chrome cookies
 
 ## How it Works
 
@@ -76,7 +76,7 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID.m4a",
   "file_size": "5.2M",
   "cached": false,
   "video_id": "dQw4w9WgXcQ",
@@ -91,7 +91,7 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID__Video_Title.m4a",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20091025__VIDEO_ID.m4a",
   "file_size": "5.2M",
   "cached": true,
   ...
@@ -108,9 +108,9 @@ Error:
 
 ## Filename Format
 
-Files use unified naming with date prefix: `{YYYYMMDD}__{video_id}__{sanitized_title}.{ext}`
+Files use unified naming with date prefix: `{YYYYMMDD}__{video_id}.{ext}`
 
-Example: `20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.m4a`
+Example: `20091025__dQw4w9WgXcQ.m4a`
 
 ## Browser Cookie Fallback
 

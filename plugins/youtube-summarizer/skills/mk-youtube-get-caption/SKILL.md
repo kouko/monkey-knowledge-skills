@@ -20,15 +20,15 @@ Download video subtitles and display content. Automatically detects video's orig
 ## Quick Start
 
 ```
-/youtube-get-caption <URL> [language|auto] [--force]
+/mk-youtube-get-caption <URL> [language|auto] [--force]
 ```
 
 ## Examples
 
-- `/youtube-get-caption https://youtube.com/watch?v=xxx` - Auto-detect original language
-- `/youtube-get-caption https://youtube.com/watch?v=xxx auto` - Explicitly use original language
-- `/youtube-get-caption https://youtube.com/watch?v=xxx ja` - Download Japanese subtitles
-- `/youtube-get-caption https://youtube.com/watch?v=xxx "zh-TW,en"` - Language priority list
+- `/mk-youtube-get-caption https://youtube.com/watch?v=xxx` - Auto-detect original language
+- `/mk-youtube-get-caption https://youtube.com/watch?v=xxx auto` - Explicitly use original language
+- `/mk-youtube-get-caption https://youtube.com/watch?v=xxx ja` - Download Japanese subtitles
+- `/mk-youtube-get-caption https://youtube.com/watch?v=xxx "zh-TW,en"` - Language priority list
 
 ## Parameters
 
@@ -62,8 +62,8 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.srt",
-  "text_file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID.en.srt",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID.en.txt",
   "language": "en",
   "subtitle_type": "manual",
   "char_count": 30287,
@@ -82,7 +82,7 @@ Success:
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.srt",
+  "file_path": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID.en.srt",
   "subtitle_type": "cached",
   "cached": true,
   ...
@@ -116,9 +116,9 @@ Error:
 
 ## Filename Format
 
-Files use unified naming with date prefix: `{YYYYMMDD}__{video_id}__{sanitized_title}.{lang}.{ext}`
+Files use unified naming with date prefix: `{YYYYMMDD}__{video_id}.{lang}.{ext}`
 
-Example: `20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.srt`
+Example: `20091025__dQw4w9WgXcQ.en.srt`
 
 ## Notes
 

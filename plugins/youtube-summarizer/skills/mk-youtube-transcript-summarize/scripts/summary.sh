@@ -124,7 +124,7 @@ fi
 # --- Force refresh: delete existing files ---
 if [ "$FORCE_REFRESH" = "true" ] && [ -n "$VIDEO_ID" ]; then
     echo "[INFO] Force refresh enabled, removing existing files..." >&2
-    rm -f "$SUMMARY_DIR/"*"__${VIDEO_ID}__"*.md 2>/dev/null || true
+    rm -f "$SUMMARY_DIR/"*"__${VIDEO_ID}."*.md 2>/dev/null || true
 fi
 
 "$JQ" -n \

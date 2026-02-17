@@ -56,7 +56,7 @@ mk-youtube-get-audio/
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/audio/20240101__VIDEO_ID__Video_Title.m4a",
+  "file_path": "/tmp/monkey_knowledge/youtube/audio/20240101__VIDEO_ID.m4a",
   "file_size": "5.2M",
   "video_id": "dQw4w9WgXcQ",
   "title": "Video Title",

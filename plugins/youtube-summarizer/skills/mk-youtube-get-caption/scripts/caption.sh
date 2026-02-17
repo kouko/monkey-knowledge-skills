@@ -247,7 +247,7 @@ fi
 # --- Force refresh: delete existing files ---
 if [ "$FORCE_REFRESH" = "true" ]; then
     echo "[INFO] Force refresh enabled, removing existing files..." >&2
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.srt "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.txt 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.srt "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.txt 2>/dev/null || true
 fi
 
 # If no language specified, get video's original language

@@ -251,7 +251,7 @@ fi
 # --- Force refresh: delete existing files ---
 if [ "$FORCE_REFRESH" = "true" ] && [ -n "$VIDEO_ID" ]; then
     echo "[INFO] Force refresh enabled, removing existing files..." >&2
-    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.json "$OUTPUT_DIR/"*"__${VIDEO_ID}__"*.txt 2>/dev/null || true
+    rm -f "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.json "$OUTPUT_DIR/"*"__${VIDEO_ID}."*.txt 2>/dev/null || true
 fi
 
 cleanup() {

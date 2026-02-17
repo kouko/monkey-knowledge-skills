@@ -32,8 +32,8 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 
 ## Examples
 
-- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Video_Title.en.txt`
-- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/transcribe/20091025__dQw4w9WgXcQ__Video_Title.txt`
+- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ.en.txt`
+- `/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/transcribe/20091025__dQw4w9WgXcQ.txt`
 
 **Typical workflow:**
 
@@ -41,8 +41,8 @@ Generate a structured, high-quality summary of a YouTube video from its transcri
 /mk-youtube-get-caption https://youtube.com/watch?v=xxx
 → outputs transcript file path
 
-/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Title.en.txt
-→ generates structured summary saved to /tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Title.en.md
+/mk-youtube-transcript-summarize /tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID.en.txt
+→ generates structured summary saved to /tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID.en.md
 ```
 
 ## How it Works
@@ -192,8 +192,8 @@ After generating the summary, save it using the Write tool:
 - **Filename**: `<transcript_basename>.md` (preserves unified naming format)
 
 **Example:**
-- Input: `/tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.txt`
-- Output: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
+- Input: `/tmp/monkey_knowledge/youtube/captions/20091025__dQw4w9WgXcQ.en.txt`
+- Output: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ.en.md`
 
 **CRITICAL — Full Display Rule**: After saving the summary file, you MUST display the COMPLETE summary content to the user in your response. Output the full markdown content exactly as written to the file. Do NOT:
 - Re-summarize or condense the summary
@@ -206,7 +206,7 @@ The user expects to see the full summary directly in the conversation without ne
 End your response with the file path:
 ```
 ---
-📄 Summary saved to: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.en.md`
+Summary saved to: `/tmp/monkey_knowledge/youtube/summaries/20091025__dQw4w9WgXcQ.en.md`
 ```
 
 ## Output Format
@@ -215,8 +215,8 @@ Script JSON output:
 ```json
 {
   "status": "success",
-  "source_transcript": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID__Video_Title.en.txt",
-  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Video_Title.en.md",
+  "source_transcript": "/tmp/monkey_knowledge/youtube/captions/20091025__VIDEO_ID.en.txt",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID.en.md",
   "char_count": 30000,
   "line_count": 450,
   "strategy": "standard",
@@ -232,7 +232,7 @@ Script JSON output:
 ```json
 {
   "status": "success",
-  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID__Video_Title.en.md",
+  "output_summary": "/tmp/monkey_knowledge/youtube/summaries/20091025__VIDEO_ID.en.md",
   "cached": true,
   "summary_char_count": 5000,
   "summary_line_count": 120,

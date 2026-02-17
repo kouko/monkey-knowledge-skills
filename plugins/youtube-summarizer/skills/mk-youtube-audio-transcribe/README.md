@@ -113,8 +113,8 @@ When model is `auto` (default), the script automatically selects the best model 
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.json",
-  "text_file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID__Video_Title.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID.json",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/transcribe/20240101__VIDEO_ID.txt",
   "language": "en",
   "duration": "3:32",
   "model": "medium",

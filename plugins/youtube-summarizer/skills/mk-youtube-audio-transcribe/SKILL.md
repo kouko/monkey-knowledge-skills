@@ -22,7 +22,7 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ## Quick Start
 
 ```
-/youtube-audio-transcribe <audio_file> [model] [language] [--force]
+/mk-youtube-audio-transcribe <audio_file> [model] [language] [--force]
 ```
 
 ## Parameters
@@ -36,11 +36,11 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 
 ## Examples
 
-- `/youtube-audio-transcribe /tmp/monkey_knowledge/youtube/audio/video.m4a` - Transcribe with auto model selection
-- `/youtube-audio-transcribe video.m4a auto zh` - Auto-select best model for Chinese → belle-zh
-- `/youtube-audio-transcribe video.m4a auto ja` - Auto-select best model for Japanese → kotoba-ja
-- `/youtube-audio-transcribe audio.mp3 small en` - Use small model, force English
-- `/youtube-audio-transcribe podcast.wav medium ja` - Use medium model (explicit), Japanese
+- `/mk-youtube-audio-transcribe /tmp/monkey_knowledge/youtube/audio/video.m4a` - Transcribe with auto model selection
+- `/mk-youtube-audio-transcribe video.m4a auto zh` - Auto-select best model for Chinese → belle-zh
+- `/mk-youtube-audio-transcribe video.m4a auto ja` - Auto-select best model for Japanese → kotoba-ja
+- `/mk-youtube-audio-transcribe audio.mp3 small en` - Use small model, force English
+- `/mk-youtube-audio-transcribe podcast.wav medium ja` - Use medium model (explicit), Japanese
 
 ## How it Works
 
@@ -89,8 +89,8 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID__Video_Title.json",
-  "text_file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID__Video_Title.txt",
+  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID.json",
+  "text_file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID.txt",
   "language": "en",
   "duration": "3:32",
   "model": "medium",
@@ -110,7 +110,7 @@ Transcribe audio files to text using local whisper.cpp (no cloud API required).
 ```json
 {
   "status": "success",
-  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID__Video_Title.json",
+  "file_path": "/tmp/monkey_knowledge/youtube/transcribe/20091025__VIDEO_ID.json",
   "cached": true,
   ...
 }
@@ -194,9 +194,9 @@ When you receive `MODEL_CORRUPTED` error:
 
 ## Filename Format
 
-Output files preserve the input audio filename's unified naming format with date prefix: `{YYYYMMDD}__{video_id}__{sanitized_title}.{ext}`
+Output files preserve the input audio filename's unified naming format with date prefix: `{YYYYMMDD}__{video_id}.{ext}`
 
-Example: `20091025__dQw4w9WgXcQ__Rick_Astley_Never_Gonna_Give_You_Up.json`
+Example: `20091025__dQw4w9WgXcQ.json`
 
 ## JSON File Format
 
@@ -249,7 +249,7 @@ When model is `auto` (default), the system automatically selects the best model 
 | ja | kotoba-ja (Japanese-specialized) |
 | others | medium (general purpose) |
 
-Example: `/youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
+Example: `/mk-youtube-audio-transcribe video.m4a auto zh` → uses `belle-zh`
 
 ## Notes
 
