@@ -479,7 +479,7 @@ write_or_merge_meta "$META_DIR/$BASENAME.meta.json" "$META_JSON" "true"
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                 Centralized Metadata Store                       │
-│                 /tmp/youtube-video-meta/                         │
+│                 /tmp/monkey_knowledge/youtube/meta/              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌──────────────┐   ┌────────────────────┐                      │
