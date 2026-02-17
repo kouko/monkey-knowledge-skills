@@ -91,7 +91,8 @@ Use parallel subagents to process chunks independently, keeping the main convers
      Read the file at {file_path} from line {start_offset} to line {end_limit} using the Read tool (with offset and limit parameters).
      Then produce a summary of this section with 5-10 bullet points covering:
      - Main topics and arguments discussed
-     - Key data points (numbers, dates, names) in **bold**
+     - Key data points (numbers, dates, names) in plain text
+     - Use sub-bullets for supporting details under a main point (max 2 levels)
      - Notable quotes as blockquotes
      Write the summary in the same language as the transcript (this will be synthesized into the user's language in the final step).
      IMPORTANT — Boundary continuity: If the beginning of your chunk clearly continues a topic from a previous section, prefix your first bullet with [continues from previous]. If the end of your chunk is mid-topic and clearly continues into the next section, suffix your last bullet with [continues to next]. This helps the synthesis step merge cross-chunk topics.
@@ -129,8 +130,9 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 
 #### {Section Title 1}
 
-- Bullet point with **key data** highlighted
-- Another point
+- Main point expressed concisely
+  - Supporting detail or data point
+- Another independent point
 - ...
 
 #### {Section Title 2}
@@ -157,10 +159,22 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
    - Each section should have 3-7 bullet points
    - Prefer more sections with focused content over fewer sections with broad content
 
-2. **Data preservation**: Always preserve and highlight specific data points
-   - Percentages, dollar amounts, dates, statistics → **bold**
-   - Person names, company names, product names → **bold** on first mention
+   Bullet formatting:
+   - Each bullet should express one main point concisely (target: under 60 characters for CJK, under 120 characters for English)
+   - When a bullet has 2+ supporting details (data, examples, sub-arguments), use second-level sub-bullets
+   - NEVER nest beyond 2 levels (no sub-sub-bullets)
+   - When details are independent facts without a shared parent topic, keep them as separate top-level bullets
+
+   Ordering:
+   - Arrange sections in the order topics appear in the video (chronological/narrative flow)
+   - Within each section, list bullets in the order they were discussed in the transcript (source order)
+   - Do NOT reorder bullets by perceived importance — preserve the speaker's narrative progression
+
+2. **Data preservation**: Always preserve specific data points in plain text
+   - Percentages, dollar amounts, dates, statistics — include as-is, no formatting
+   - Person names, company names, product names — include as-is, no formatting
    - Direct quotes that are impactful → use blockquote format
+   - Do NOT use inline bold (`**text**`) anywhere in the summary body (Content Summary and Key Takeaways sections)
 
 3. **Language**: Write the summary in the user's conversation language
    - Detect the language the user is using in the current conversation
@@ -183,6 +197,7 @@ After obtaining the transcript, generate the summary using EXACTLY this structur
 6. **Key Takeaways**: End with 5-8 bullet points summarizing the most important insights
    - These should be standalone — understandable without reading the full summary
    - Prioritize actionable insights and surprising findings
+   - Order by importance/impact (most significant insight first, descending)
 
 ## Save Summary to File
 
