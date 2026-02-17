@@ -16,7 +16,11 @@ A plugin marketplace for AI coding assistants. Follows the [Agent Skills](https:
 ### Claude Code
 
 ```bash
+# 1. Add marketplace
 /plugin marketplace add kouko/monkey-knowledge-skills
+
+# 2. Install plugin
+/plugin install youtube-summarizer@kouko-monkey-knowledge-skills
 ```
 
 ### Gemini CLI

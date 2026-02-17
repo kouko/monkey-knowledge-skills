@@ -339,11 +339,11 @@ All skills include video metadata in their JSON output when available.
 ### Claude Code
 
 ```bash
-# Add marketplace
+# 1. Add marketplace
 /plugin marketplace add kouko/monkey-knowledge-skills
 
-# Install plugin
-/plugin install youtube-summarizer@monkey-marketplace
+# 2. Install plugin
+/plugin install youtube-summarizer@kouko-monkey-knowledge-skills
 ```
 
 ### Gemini CLI
