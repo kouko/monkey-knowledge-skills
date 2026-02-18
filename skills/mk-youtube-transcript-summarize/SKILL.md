@@ -3,7 +3,7 @@ name: mk-youtube-transcript-summarize
 description: Summarize YouTube video content with structured output. Use when user wants a detailed summary from a transcript file path.
 license: MIT
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   author: kouko
   tags:
     - youtube

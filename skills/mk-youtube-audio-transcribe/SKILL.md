@@ -3,7 +3,7 @@ name: mk-youtube-audio-transcribe
 description: Transcribe audio to text using local whisper.cpp. Use when user wants to convert audio/video to text, get transcription, or speech-to-text.
 license: MIT
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   author: kouko
   tags:
     - youtube

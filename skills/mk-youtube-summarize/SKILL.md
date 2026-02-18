@@ -3,7 +3,7 @@ name: mk-youtube-summarize
 description: Summarize YouTube videos or channel's latest videos. Use for single video URL, channel URL, or @handle to summarize recent uploads.
 license: MIT
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   author: kouko
   tags:
     - youtube
