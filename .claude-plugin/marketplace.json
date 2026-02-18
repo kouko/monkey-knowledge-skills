@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "YouTube video summarization skills for AI coding assistants",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "plugins": [
     {
       "name": "youtube-summarizer",
       "source": ".",
       "description": "Summarize YouTube videos from URL or transcript",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "category": "productivity",
       "keywords": ["youtube", "video", "summarize", "transcript"]
     }
