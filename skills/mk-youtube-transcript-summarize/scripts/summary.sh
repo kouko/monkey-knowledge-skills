@@ -74,8 +74,8 @@ if [ -n "$VIDEO_ID" ]; then
     fi
 fi
 
-# Summaries directory
-SUMMARY_DIR="$MONKEY_KNOWLEDGE_TMP/youtube/summaries"
+# Summaries directory (skill-local)
+SUMMARY_DIR="$(cd "$(dirname "$0")/.." && pwd)/data"
 mkdir -p "$SUMMARY_DIR"
 
 # --- Cache check (unless --force) ---

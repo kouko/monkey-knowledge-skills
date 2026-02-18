@@ -18,7 +18,8 @@ set -- "${ARGS[@]}"
 
 URL="$1"
 LANG="${2:-}"  # Empty means auto-detect original language
-OUTPUT_DIR="$MONKEY_KNOWLEDGE_TMP/youtube/captions"
+SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+OUTPUT_DIR="$SKILL_DIR/data"
 
 if [ -z "$URL" ]; then
     "$JQ" -n --arg status "error" \
