@@ -4,7 +4,14 @@ set -e
 # Load dependencies
 source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
+source "$(dirname "$0")/_utility__ensure_ffmpeg.sh" 2>/dev/null || true
 source "$(dirname "$0")/_utility__naming.sh"
+
+# Build --ffmpeg-location args if ffmpeg is available
+FFMPEG_ARGS=()
+if [ -n "$FFMPEG_DIR" ]; then
+    FFMPEG_ARGS=(--ffmpeg-location "$FFMPEG_DIR")
+fi
 
 CHANNEL="$1"
 LIMIT="${2:-10}"
@@ -22,7 +29,7 @@ if [[ "$CHANNEL" == *"youtube.com/watch"* ]] || \
    [[ "$CHANNEL" == *"youtube.com/shorts/"* ]] || \
    [[ "$CHANNEL" == *"youtu.be/"* ]]; then
     # Extract channel URL from video
-    CHANNEL_BASE=$("$YT_DLP" --print channel_url "$CHANNEL" 2>/dev/null)
+    CHANNEL_BASE=$("$YT_DLP" "${FFMPEG_ARGS[@]}" --print channel_url "$CHANNEL" 2>/dev/null)
     if [ -z "$CHANNEL_BASE" ]; then
         "$JQ" -n --arg status "error" \
             --arg message "Could not extract channel from video URL" \
@@ -44,7 +51,7 @@ fi
 
 # Fetch channel info (name and URL) from the first video
 # This is needed because --flat-playlist on channel tabs doesn't include channel info
-CHANNEL_INFO=$("$YT_DLP" --print channel --print channel_url --playlist-items 1 "$CHANNEL_BASE/videos" 2>/dev/null || echo "")
+CHANNEL_INFO=$("$YT_DLP" "${FFMPEG_ARGS[@]}" --print channel --print channel_url --playlist-items 1 "$CHANNEL_BASE/videos" 2>/dev/null || echo "")
 CHANNEL_NAME=$(echo "$CHANNEL_INFO" | head -1)
 CHANNEL_URL=$(echo "$CHANNEL_INFO" | tail -1)
 
@@ -58,10 +65,12 @@ fetch_tab() {
         "$YT_DLP" --dump-json --flat-playlist \
             --playlist-items "1:$limit" \
             --match-filters "$filter" \
+            "${FFMPEG_ARGS[@]}" \
             "$tab_url" 2>/dev/null || echo ""
     else
         "$YT_DLP" --dump-json --flat-playlist \
             --playlist-items "1:$limit" \
+            "${FFMPEG_ARGS[@]}" \
             "$tab_url" 2>/dev/null || echo ""
     fi
 }

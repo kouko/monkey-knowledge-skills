@@ -81,6 +81,15 @@ find_ytdlp() {
         return 0
     fi
 
+    # 1b. Check well-known install paths (PATH may be incomplete in plugin environments)
+    local known_path
+    for known_path in /opt/homebrew/bin/yt-dlp /usr/local/bin/yt-dlp; do
+        if [ -x "$known_path" ]; then
+            echo "$known_path"
+            return 0
+        fi
+    done
+
     # 2. Check bin/ directory - universal binary (official release, preferred)
     local binary_name
     binary_name=$(get_ytdlp_binary_name)

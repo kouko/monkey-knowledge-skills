@@ -4,7 +4,14 @@ set -e
 # Load dependency scripts
 source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
+source "$(dirname "$0")/_utility__ensure_ffmpeg.sh" 2>/dev/null || true
 source "$(dirname "$0")/_utility__naming.sh"
+
+# Build --ffmpeg-location args if ffmpeg is available
+FFMPEG_ARGS=()
+if [ -n "$FFMPEG_DIR" ]; then
+    FFMPEG_ARGS=(--ffmpeg-location "$FFMPEG_DIR")
+fi
 
 # --- Parse --force flag from any position ---
 FORCE_REFRESH=false
@@ -244,7 +251,7 @@ download_audio() {
     fi
 
     # Download to temp directory first, then rename
-    "$YT_DLP" -x -o "$TEMP_DIR/%(id)s.%(ext)s" "${cookie_args[@]}" "$URL" 2>&1
+    "$YT_DLP" -x -o "$TEMP_DIR/%(id)s.%(ext)s" "${cookie_args[@]}" "${FFMPEG_ARGS[@]}" "$URL" 2>&1
 }
 
 # First attempt: without authentication

@@ -4,7 +4,14 @@ set -e
 # Load dependency scripts
 source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
+source "$(dirname "$0")/_utility__ensure_ffmpeg.sh" 2>/dev/null || true
 source "$(dirname "$0")/_utility__naming.sh"
+
+# Build --ffmpeg-location args if ffmpeg is available
+FFMPEG_ARGS=()
+if [ -n "$FFMPEG_DIR" ]; then
+    FFMPEG_ARGS=(--ffmpeg-location "$FFMPEG_DIR")
+fi
 
 QUERY="$1"
 COUNT="${2:-10}"
@@ -28,7 +35,7 @@ fi
 
 # Search and format results (aligned with channel-latest output format)
 RESULT=$("$YT_DLP" "ytsearch${COUNT}:${QUERY}" \
-    $YT_OPTS 2>/dev/null | \
+    $YT_OPTS "${FFMPEG_ARGS[@]}" 2>/dev/null | \
     "$JQ" -s 'map({
         video_id: .id,
         title,

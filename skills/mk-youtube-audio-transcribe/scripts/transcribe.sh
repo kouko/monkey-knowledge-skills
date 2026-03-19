@@ -36,7 +36,7 @@ if [ -z "$JQ" ]; then
 fi
 
 # Load ffmpeg
-if ! source "$SCRIPT_DIR/_ensure_ffmpeg.sh"; then
+if ! source "$SCRIPT_DIR/_utility__ensure_ffmpeg.sh"; then
     "$JQ" -n '{status:"error",message:"Failed to load ffmpeg dependency script"}'
     exit 1
 fi
@@ -45,7 +45,7 @@ if [ -n "$FFMPEG_ERROR_JSON" ]; then
     exit 1
 fi
 if [ -z "$FFMPEG" ]; then
-    "$JQ" -n '{status:"error",message:"FFMPEG not set after sourcing _ensure_ffmpeg.sh"}'
+    "$JQ" -n '{status:"error",message:"FFMPEG not set after sourcing _utility__ensure_ffmpeg.sh"}'
     exit 1
 fi
 

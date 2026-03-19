@@ -3,7 +3,14 @@ set -e
 
 source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
+source "$(dirname "$0")/_utility__ensure_ffmpeg.sh" 2>/dev/null || true
 source "$(dirname "$0")/_utility__naming.sh"
+
+# Build --ffmpeg-location args if ffmpeg is available
+FFMPEG_ARGS=()
+if [ -n "$FFMPEG_DIR" ]; then
+    FFMPEG_ARGS=(--ffmpeg-location "$FFMPEG_DIR")
+fi
 
 # --- Parse --force flag from any position ---
 FORCE_REFRESH=false
@@ -294,12 +301,14 @@ download_subtitles() {
                   "${sub_lang_args[@]}" \
                   --skip-download --convert-subs srt \
                   "${cookie_args[@]}" \
+                  "${FFMPEG_ARGS[@]}" \
                   -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
     else
         "$YT_DLP" --write-subs \
                   "${sub_lang_args[@]}" \
                   --skip-download --convert-subs srt \
                   "${cookie_args[@]}" \
+                  "${FFMPEG_ARGS[@]}" \
                   -o "$TEMP_DIR/%(id)s" "$URL" >&2 || true
     fi
 }
