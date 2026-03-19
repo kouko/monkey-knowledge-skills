@@ -4,7 +4,14 @@ set -e
 # Load dependency scripts
 source "$(dirname "$0")/_utility__ensure_ytdlp.sh"
 source "$(dirname "$0")/_utility__ensure_jq.sh"
+source "$(dirname "$0")/_utility__ensure_ffmpeg.sh" 2>/dev/null || true
 source "$(dirname "$0")/_utility__naming.sh"
+
+# Build --ffmpeg-location args if ffmpeg is available
+FFMPEG_ARGS=()
+if [ -n "$FFMPEG_DIR" ]; then
+    FFMPEG_ARGS=(--ffmpeg-location "$FFMPEG_DIR")
+fi
 
 URL="$1"
 BROWSER="${2:-}"  # Optional: specify browser (chrome, firefox, safari, etc.)
@@ -78,7 +85,7 @@ fetch_info() {
         done
     fi
 
-    "$YT_DLP" -j --no-download "${cookie_args[@]}" "$URL" 2>/dev/null
+    "$YT_DLP" -j --no-download "${cookie_args[@]}" "${FFMPEG_ARGS[@]}" "$URL" 2>/dev/null
 }
 
 # Pre-check: determine if we should use cookies first based on existing metadata

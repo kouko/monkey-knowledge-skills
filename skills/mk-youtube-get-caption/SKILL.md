@@ -3,7 +3,7 @@ name: mk-youtube-get-caption
 description: Download YouTube video subtitles. Use when user wants to get captions or subtitles from a video.
 license: MIT
 metadata:
-  version: 1.2.0
+  version: 1.2.1
   author: kouko
   tags:
     - youtube
