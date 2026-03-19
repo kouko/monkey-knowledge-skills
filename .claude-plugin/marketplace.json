@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "monkey-knowledge-youtube-skills",
-      "source": ".",
+      "source": "./",
       "description": "Summarize YouTube videos from URL or transcript",
       "version": "1.1.0",
       "category": "productivity",
